@@ -1,0 +1,87 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>2.7. Periodic indexing</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="Recoll user manual"><link rel="up" href="RCL.INDEXING.html" title="Chapter 2. Indexing"><link rel="prev" href="RCL.INDEXING.EXTTAGS.html" title="2.6. Importing external tags"><link rel="next" href="RCL.INDEXING.MONITOR.html" title="2.8. Real time indexing"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">2.7. Periodic indexing</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="RCL.INDEXING.EXTTAGS.html">Prev</a> </td><th width="60%" align="center">Chapter 2. Indexing</th><td width="20%" align="right"> <a accesskey="n" href="RCL.INDEXING.MONITOR.html">Next</a></td></tr></table><hr></div><div class="sect1" title="2.7. Periodic indexing"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="RCL.INDEXING.PERIODIC"></a>2.7. Periodic indexing</h2></div></div></div><div class="sect2" title="2.7.1. Running indexing"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.INDEXING.PERIODIC.EXEC"></a>2.7.1. Running indexing</h3></div></div></div><p>Indexing is always performed by the
+          <span class="command"><strong>recollindex</strong></span> program, which can be started
+          either from the command line or from the <span class="guimenu">File</span>
+          menu in the <span class="command"><strong>recoll</strong></span> GUI program. When started
+          from the GUI, the indexing will run on the same configuration
+          <span class="command"><strong>recoll</strong></span> was started on. When started from the
+          command line, <span class="command"><strong>recollindex</strong></span> will use the
+          <code class="envar">RECOLL_CONFDIR</code> variable or accept a
+          <code class="option">-c</code> <em class="replaceable"><code>confdir</code></em> option
+          to specify a non-default configuration directory.</p><p>If the <span class="command"><strong>recoll</strong></span> program finds no index
+          when it starts, it will automatically start indexing (except
+          if canceled).</p><p>The <span class="command"><strong>recollindex</strong></span> indexing process can be
+          interrupted by sending an interrupt (<span class="keysym">Ctrl-C</span>, 
+	  SIGINT) or terminate
+          (SIGTERM) signal. Some time may elapse before the process exits,
+          because it needs to properly flush and close the index. This can
+          also be done from the <span class="command"><strong>recoll</strong></span> GUI
+	  <span class="guimenu">File</span> &#8594; <span class="guimenuitem">Stop Indexing</span>
+          menu entry.</p><p>After such an interruption, the index will be somewhat
+	  inconsistent because some operations which are normally
+	  performed at the end of the indexing pass will have been
+	  skipped (for example, the stemming and spelling databases
+	  will be inexistant or out of date). You just need to restart
+	  indexing at a later time to restore consistency. The
+	  indexing will restart at the interruption point (the full
+	  file tree will be traversed, but files that were indexed up
+	  to the interruption and for which the index is still up to
+	  date will not need to be reindexed).</p><p><span class="command"><strong>recollindex</strong></span> has a number of other options
+          which are described in its man page. Only a few will be
+          described here.</p><p>Option <code class="option">-z</code> will reset the index when
+	  starting. This is almost the same as destroying the index
+	  files (the nuance is that the <span class="application">Xapian</span> format version will not
+	  be changed).</p><p>Option <code class="option">-Z</code> will force the update of all
+	  documents without resetting the index first. This will not
+	  have the "clean start" aspect of <code class="option">-z</code>, but
+	  the advantage is that the index will remain available for
+	  querying while it is rebuilt, which can be a significant
+	  advantage if it is very big (some installations need days
+	  for a full index rebuild).</p><p>Of special interest also, maybe, are
+          the <code class="option">-i</code> and
+          <code class="option">-f</code> options. <code class="option">-i</code> allows
+          indexing an explicit list of files (given as command line
+          parameters or read on <code class="literal">stdin</code>). 
+	  <code class="option">-f</code> tells
+          <span class="command"><strong>recollindex</strong></span> to ignore file selection
+          parameters from the configuration. Together, these options allow
+          building a custom file selection process for some area of the
+          file system, by adding the top directory to the
+          <code class="varname">skippedPaths</code> list and using an appropriate
+          file selection method to build the file list to be fed to
+          <span class="command"><strong>recollindex</strong></span> <code class="option">-if</code>. 
+	  Trivial example:</p><pre class="programlisting">
+	    find . -name indexable.txt -print | recollindex -if
+	  </pre><p><span class="command"><strong>recollindex</strong></span> <code class="option">-i</code> will 
+	  not descend into subdirectories specified as parameters, 
+	  but just add them as index entries. It is
+          up to the external file selection method to build the complete
+          file list.</p></div><div class="sect2" title="2.7.2. Using cron to automate indexing"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.INDEXING.PERIODIC.AUTOMAT"></a>2.7.2. Using <span class="command"><strong>cron</strong></span> to automate
+          indexing</h3></div></div></div><p>The most common way to set up indexing is to have a cron
+          task execute it every night. For example the following
+          <code class="filename">crontab</code> entry would do it every day at
+          3:30AM (supposing <span class="command"><strong>recollindex</strong></span> is in your
+          PATH):
+
+        </p><pre class="screen">
+30 3 * * * recollindex &gt; /some/tmp/dir/recolltrace 2&gt;&amp;1
+</pre><p>
+
+	  Or, using <span class="command"><strong>anacron</strong></span>:
+</p><pre class="screen">
+1  15  su mylogin -c "recollindex recollindex &gt; /tmp/rcltraceme 2&gt;&amp;1"
+</pre><p>
+        </p><p>As of version 1.17 the <span class="application">Recoll</span> GUI has dialogs to manage
+          <code class="filename">crontab</code> entries for
+          <span class="command"><strong>recollindex</strong></span>. You can reach them from the
+	  <span class="guimenu">Preferences</span> &#8594; <span class="guimenuitem">Indexing Schedule</span> 
+	  menu. They only 
+          work with the good old <span class="command"><strong>cron</strong></span>, and do not give
+          access to all features of <span class="command"><strong>cron</strong></span> scheduling.</p><p>The usual command to edit your
+          <code class="filename">crontab</code> is <span class="command"><strong>crontab</strong></span>
+          <code class="option">-e</code> (which will usually start the
+          <span class="command"><strong>vi</strong></span> editor to edit the file). You may have
+          more sophisticated tools available on your system.</p><p>Please be aware that there may be differences between your
+          usual interactive command line environment and the one seen by
+          crontab commands. Especially the PATH variable may be of
+          concern. Please check the crontab manual pages about possible
+          issues.</p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="RCL.INDEXING.EXTTAGS.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="RCL.INDEXING.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="RCL.INDEXING.MONITOR.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">2.6. Importing external tags </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 2.8. Real time indexing</td></tr></table></div></body></html>

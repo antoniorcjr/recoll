@@ -1,0 +1,122 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>5.3. Building from source</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="Recoll user manual"><link rel="up" href="RCL.INSTALL.html" title="Chapter 5. Installation and configuration"><link rel="prev" href="RCL.INSTALL.EXTERNAL.html" title="5.2. Supporting packages"><link rel="next" href="RCL.INSTALL.CONFIG.html" title="5.4. Configuration overview"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">5.3. Building from source</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="RCL.INSTALL.EXTERNAL.html">Prev</a> </td><th width="60%" align="center">Chapter 5. Installation and configuration</th><td width="20%" align="right"> <a accesskey="n" href="RCL.INSTALL.CONFIG.html">Next</a></td></tr></table><hr></div><div class="sect1" title="5.3. Building from source"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="RCL.INSTALL.BUILDING"></a>5.3. Building from source</h2></div></div></div><div class="sect2" title="5.3.1. Prerequisites"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.INSTALL.BUILDING.PREREQS"></a>5.3.1. Prerequisites</h3></div></div></div><p>If you can install any or all of the following through
+          the package manager for your system, all the
+          better. Especially <span class="application">Qt</span> is a very
+          big piece of software, but you will most probably be able to
+          find a binary package.</p><p>You may have to compile <span class="application">Xapian</span> but this is easy.</p><p>The shopping list:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>C++ compiler. Up to <span class="application">Recoll</span> version 1.13.04,
+              its absence can manifest itself by strange messages
+              about a missing iconv_open.</p></li><li class="listitem"><p>Development files
+              for <a class="ulink" href="http://www.xapian.org" target="_top"> <span class="application">Xapian
+                  core</span></a>.</p><div class="important" title="Important" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Important</h3><p>If you are
+                building Xapian for an older CPU (before Pentium 4 or Athlon
+                64), you need to add the <code class="option">--disable-sse</code> flag
+                to the configure command. Else all Xapian application will
+                crash with an <code class="literal">illegal instruction</code>
+                error.</p></div></li><li class="listitem"><p>Development files for 
+              <a class="ulink" href="http://qt-project.org/downloads" target="_top">
+                <span class="application">Qt 4</span> </a>. <span class="application">Recoll</span> has not been
+              tested with <span class="application">Qt 5</span> yet. <span class="application">Recoll</span> 1.15.9
+              was the last version to support <span class="application">Qt 3</span>.
+              If you do not want to install or build
+              the <span class="application">Qt Webkit</span> module, <span class="application">Recoll</span>
+              has a configuration option to disable its use (see further).
+            </p></li><li class="listitem"><p>Development files for <span class="application">X11</span> and
+	    <span class="application">zlib</span>.</p></li><li class="listitem"><p>You may also need 
+            <a class="ulink" href="http://www.gnu.org/software/libiconv/" target="_top">
+              libiconv</a>. On <span class="application">Linux</span>
+              systems, the iconv interface is part of libc and you should not
+            need to do anything special.</p></li></ul></div><p>Check the <a class="ulink" href="http://www.recoll.org/download.html" target="_top">
+         <span class="application">Recoll</span> download page</a> for up to date version
+         information.</p></div><div class="sect2" title="5.3.2. Building"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.INSTALL.BUILDING.BUILD"></a>5.3.2. Building</h3></div></div></div><p><span class="application">Recoll</span> has been built on Linux, FreeBSD, Mac OS X, and Solaris,
+      most versions after 2005 should be ok, maybe some older ones too
+      (Solaris 8 is ok). If you build on another system, and
+        need to modify things,
+        <a class="ulink" href="mailto:jfd@recoll.org" target="_top">I would
+        very much welcome patches</a>.</p><p title="Configure options:"><b>Configure options: </b>
+        </p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p><code class="option">--without-aspell</code> 
+            will disable the code for phonetic matching of search
+            terms. </p></li><li class="listitem"><p><code class="option">--with-fam</code> or
+            <code class="option">--with-inotify</code> will enable the code for
+            real time indexing. Inotify support is enabled by default on
+            recent Linux systems.</p></li><li class="listitem"><p><code class="option">--with-qzeitgeist</code> will
+	      enable sending <span class="application">Zeitgeist</span>
+	      events about the visited search results, and needs
+	      the <span class="application">qzeitgeist</span>
+	      package.</p></li><li class="listitem"><p><code class="option">--disable-webkit</code> is available
+              from version 1.17 to implement the result list with a
+              <span class="application">Qt</span> QTextBrowser instead of a
+              WebKit widget if you do not or can't depend on the
+              latter.</p></li><li class="listitem"><p><code class="option">--disable-idxthreads</code> is available
+              from version 1.19 to suppress multithreading inside the
+              indexing process. You can also use the run-time
+              configuration to restrict <span class="command"><strong>recollindex</strong></span>
+              to using a single thread, but the compile-time option
+              may disable a few more unused locks. This only applies
+              to the use of multithreading for the core index
+              processing (data input). The <span class="application">Recoll</span> monitor mode always
+              uses at least two threads of execution.</p></li><li class="listitem"><p><code class="option">--disable-python-module</code> will 
+              avoid building the <span class="application">Python</span>
+              module.</p></li><li class="listitem"><p><code class="option">--disable-xattr</code> will prevent
+ 	      fetching data from file extended attributes. Beyond a
+ 	      few standard attributes, fetching extended attributes
+ 	      data can only be useful is some application stores data
+ 	      in there, and also needs some simple configuration (see
+ 	      comments in the <code class="filename">fields</code> configuration
+	      file).</p></li><li class="listitem"><p><code class="option">--enable-camelcase</code> will enable
+ 	    splitting <em class="replaceable"><code>camelCase</code></em> words. This
+	    is not enabled by default as it has the unfortunate
+	    side-effect of making some phrase searches quite
+	    confusing: ie, <code class="literal">"MySQL manual"</code> would be
+	    matched by <code class="literal">"MySQL manual"</code> and
+	    <code class="literal">"my sql manual"</code> but not <code class="literal">"mysql
+	    manual"</code> (only inside phrase searches).</p></li><li class="listitem"><p><code class="option">--with-file-command</code> Specify
+	    the version of the 'file' command to use (ie:
+            --with-file-command=/usr/local/bin/file). Can be useful to
+            enable the gnu version on systems where the native one is
+            bad.</p></li><li class="listitem"><p><code class="option">--disable-qtgui</code> Disable the Qt
+	    interface. Will allow building the indexer and the command line
+	    search program in absence of a Qt environment.</p></li><li class="listitem"><p><code class="option">--disable-x11mon</code> Disable
+	    <span class="application">X11</span> connection monitoring
+	    inside recollindex. Together with --disable-qtgui, this
+	    allows building recoll without
+	    <span class="application">Qt</span> and
+	    <span class="application">X11</span>.</p></li><li class="listitem"><p><code class="option">--disable-pic</code> will compile
+	      <span class="application">Recoll</span> with position-dependant code. This is incompatible with
+	      building the KIO or the <span class="application">Python</span>
+	      or <span class="application">PHP</span> extensions, but might
+	      yield very marginally faster code.</p></li><li class="listitem"><p>Of course the usual 
+	  <span class="application">autoconf</span> <span class="command"><strong>configure</strong></span>
+	  options, like <code class="option">--prefix</code> apply.</p></li></ul></div><p title="Configure options:">
+         </p><p>Normal procedure:</p><pre class="screen">
+        <strong class="userinput"><code>cd recoll-xxx</code></strong>
+        <strong class="userinput"><code>configure</code></strong>
+        <strong class="userinput"><code>make</code></strong>
+        <strong class="userinput"><code>(practices usual hardship-repelling invocations)</code></strong>
+      </pre><p>There is little auto-configuration. The
+        <span class="command"><strong>configure</strong></span> script will mainly link one of
+        the system-specific files in the <code class="filename">mk</code>
+        directory to <code class="filename">mk/sysconf</code>. If your system
+        is not known yet, it will tell you as much, and you may want
+        to manually copy and modify one of the existing files (the new
+        file name should be the output of <span class="command"><strong>uname</strong></span>
+        <code class="option">-s</code>).</p><div class="sect3" title="5.3.2.1. Building on Solaris"><div class="titlepage"><div><div><h4 class="title"><a name="RCL.INSTALL.BUILDING.BUILD.SOLARIS"></a>5.3.2.1. Building on Solaris</h4></div></div></div><p>We did not test building the GUI on Solaris for recent
+	  versions. You will need at least Qt 4.4. There are some hints
+	  on <a class="ulink" href="http://www.recoll.org/download-1.14.html" target="_top">an old
+	    web site page</a>, they may still be valid.</p><p>Someone did test the 1.19 indexer and Python module build,
+	  they do work, with a few minor glitches. Be sure to use
+	  GNU <span class="command"><strong>make</strong></span> and <span class="command"><strong>install</strong></span>.</p></div></div><div class="sect2" title="5.3.3. Installation"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.INSTALL.BUILDING.INSTALL"></a>5.3.3. Installation</h3></div></div></div><p>Either type <strong class="userinput"><code>make install</code></strong> or execute
+      <strong class="userinput"><code>recollinstall
+      <em class="replaceable"><code>prefix</code></em></code></strong>, in the root 
+        of the source tree. This will copy the commands to
+        <code class="filename"><em class="replaceable"><code>prefix</code></em>/bin</code>
+        and the sample configuration files, scripts and other shared
+        data to
+        <code class="filename"><em class="replaceable"><code>prefix</code></em>/share/recoll</code>.</p><p>If the installation prefix given to
+        <span class="command"><strong>recollinstall</strong></span> is different from either the 
+	system default or the value which was
+        specified when executing <span class="command"><strong>configure</strong></span> (as in 
+	<strong class="userinput"><code>configure --prefix /some/path</code></strong>), you
+        will have to set the <code class="envar">RECOLL_DATADIR</code>
+        environment variable to indicate where the shared data is to
+        be found (ie for (ba)sh: 
+	<strong class="userinput"><code>export RECOLL_DATADIR=/some/path/share/recoll</code></strong>).
+	</p><p>You can then proceed to <a class="link" href="RCL.INSTALL.CONFIG.html" title="5.4. Configuration overview">configuration</a>. </p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="RCL.INSTALL.EXTERNAL.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="RCL.INSTALL.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="RCL.INSTALL.CONFIG.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">5.2. Supporting packages </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 5.4. Configuration overview</td></tr></table></div></body></html>

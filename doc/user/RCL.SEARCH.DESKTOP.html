@@ -1,0 +1,30 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>3.8. Desktop integration</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="Recoll user manual"><link rel="up" href="RCL.SEARCH.html" title="Chapter 3. Searching"><link rel="prev" href="RCL.SEARCH.ANCHORWILD.html" title="3.7. Anchored searches and wildcards"><link rel="next" href="RCL.PROGRAM.html" title="Chapter 4. Programming interface"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">3.8. Desktop integration</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="RCL.SEARCH.ANCHORWILD.html">Prev</a> </td><th width="60%" align="center">Chapter 3. Searching</th><td width="20%" align="right"> <a accesskey="n" href="RCL.PROGRAM.html">Next</a></td></tr></table><hr></div><div class="sect1" title="3.8. Desktop integration"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="RCL.SEARCH.DESKTOP"></a>3.8. Desktop integration</h2></div></div></div><p>Being independant of the desktop type has its drawbacks: <span class="application">Recoll</span>
+      desktop integration is minimal. However there are a few tools
+      available:
+      </p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>The <span class="application">KDE</span> KIO Slave was
+            described in a <a class="link" href="RCL.SEARCH.KIO.html" title="3.2. Searching with the KDE KIO slave">previous 
+            section</a>.</p></li><li class="listitem"><p>If you use a recent version of Ubuntu Linux, you may
+             find the <a class="ulink" href="http://bitbucket.org/medoc/recoll/wiki/UnityLens" target="_top">Ubuntu Unity
+           Lens</a> module useful.</p></li><li class="listitem"><p>There is also an independantly developed
+                 <a class="ulink" href="http://kde-apps.org/content/show.php/recollrunner?content=128203" target="_top">
+            Krunner plugin</a>.</p></li></ul></div><p>
+       </p><p>Here follow a few other things that may help.</p><div class="sect2" title="3.8.1. Hotkeying recoll"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.SEARCH.SHORTCUT"></a>3.8.1. Hotkeying recoll</h3></div></div></div><p>It is surprisingly convenient to be able to show or hide the
+          <span class="application">Recoll</span> GUI with a single keystroke. Recoll comes with a small
+          Python script, based on the <span class="application">libwnck</span> window
+          manager interface library, which will allow you to do just
+          this. The detailed instructions are on
+          <a class="ulink" href="http://bitbucket.org/medoc/recoll/wiki/HotRecoll" target="_top">this wiki page</a>.</p></div><div class="sect2" title="3.8.2. The KDE Kicker Recoll applet"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.KICKER-APPLET"></a>3.8.2. The KDE Kicker Recoll applet</h3></div></div></div><p>This is probably obsolete now. Anyway:</p><p>The <span class="application">Recoll</span> source tree contains the source code to the
+        <span class="application">recoll_applet</span>, a small application derived
+        from the <span class="application">find_applet</span>. This can be used to
+        add a small <span class="application">Recoll</span> launcher to the KDE panel.</p><p>The applet is not automatically built with the main <span class="application">Recoll</span>
+         programs, nor is it included with the main source distribution
+        (because the KDE build boilerplate makes it relatively big). You can
+        download its source from the recoll.org download page. Use the
+        omnipotent <strong class="userinput"><code>configure;make;make install</code></strong>
+        incantation to build and install.</p><p>You can then add the applet to the panel by right-clicking the
+        panel and choosing the <span class="guilabel">Add applet</span> entry.</p><p>The <span class="application">recoll_applet</span> has a small text
+         window where you can type a <span class="application">Recoll</span> query (in query language form),
+         and an icon which can be used to restrict the search to certain
+         types of files. It is quite primitive, and launches a new recoll
+         GUI instance every time (even if it is already running). You may
+         find it useful anyway.</p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="RCL.SEARCH.ANCHORWILD.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="RCL.SEARCH.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="RCL.PROGRAM.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">3.7. Anchored searches and wildcards </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Chapter 4. Programming interface</td></tr></table></div></body></html>

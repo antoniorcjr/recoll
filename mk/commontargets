@@ -1,0 +1,14 @@
+
+librecoll:
+	make -C $(depth)/lib
+
+depend: alldeps.stamp
+alldeps.stamp : $(SRCS)
+	$(CXX) -M $(ALL_CXXFLAGS) $(SRCS) > alldeps
+	touch alldeps.stamp
+
+clean:
+	cp /dev/null alldeps
+	rm -f alldeps.stamp
+	rm -f *.o ${LIBS} ${PROGS} ${OBJS} 
+

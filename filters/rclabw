@@ -1,0 +1,179 @@
+#!/bin/sh
+# @(#$Id: rclabw,v 1.3 2008-10-08 08:27:34 dockes Exp $  (C) 2004 J.F.Dockes
+# Parts taken from Estraier:
+#================================================================
+# Estraier: a personal full-text search system
+# Copyright (C) 2003-2004 Mikio Hirabayashi
+#================================================================
+#================================================================
+# Extract text from an abiword file
+#================================================================
+
+# set variables
+LANG=C ; export LANG
+LC_ALL=C ; export LC_ALL
+progname="rclabw"
+filetype=abiword
+
+
+#RECFILTCOMMONCODE
+##############################################################################
+# !! Leave the previous line unmodified!! Code imported from the
+# recfiltcommon file
+
+# Utility code common to all shell filters. This could be sourced at run
+# time, but it's slightly more efficient to include the code in the
+# filters at build time (with a sed script).
+
+# Describe error in a way that can be interpreted by our caller
+senderror()
+{
+    echo RECFILTERROR $*
+    # Also alert on stderr just in case
+    echo ":2:$progname::: $*" 1>&2
+    exit 1
+}
+
+iscmd()
+{
+    cmd=$1
+    case $cmd in
+    */*)
+	if test -x $cmd -a ! -d $cmd ; then return 0; else return 1; fi ;;
+    *)
+      oldifs=$IFS; IFS=":"; set -- $PATH; IFS=$oldifs
+      for d in $*;do test -x $d/$cmd -a ! -d $d/$cmd && return 0;done
+      return 1 ;;
+    esac
+}
+
+checkcmds()
+{
+    for cmd in $*;do
+      if iscmd $cmd 
+      then 
+        a=1
+      else 
+        senderror HELPERNOTFOUND $cmd
+      fi
+    done
+}
+
+# show help message
+if test $# -ne 1 -o "$1" = "--help" 
+then
+  echo "Convert a $filetype file to HTML text for Recoll indexing."
+  echo "Usage: $progname [infile]"
+  exit 1
+fi
+
+infile="$1"
+
+# check the input file existence (may be '-' for stdin)
+if test "X$infile" != X- -a ! -f "$infile"
+then
+  senderror INPUTNOSUCHFILE "$infile"
+fi
+
+# protect access to our temp files and directories
+umask 77
+
+##############################################################################
+# !! Leave the following line unmodified !
+#ENDRECFILTCOMMONCODE
+
+checkcmds xsltproc
+
+xsltproc --nonet --novalid - "$infile" <<EOF
+<?xml version="1.0"?>
+<xsl:stylesheet version="1.0"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:ab="http://www.abisource.com/awml.dtd" 
+  exclude-result-prefixes="ab"
+  >
+
+<xsl:output method="html" encoding="UTF-8"/>
+
+<xsl:template match="/">
+<html>
+  <head>
+    <xsl:apply-templates select="ab:abiword/ab:metadata"/>
+  </head>
+  <body>
+
+    <!-- This is for the older abiword format with no namespaces -->
+    <xsl:for-each select="abiword/section">
+      <xsl:apply-templates select="p"/>
+    </xsl:for-each>
+
+    <!-- Newer namespaced format -->
+    <xsl:for-each select="ab:abiword/ab:section">
+      <xsl:for-each select="ab:p">
+        <p><xsl:value-of select="."/></p><xsl:text>
+        </xsl:text>
+      </xsl:for-each>
+    </xsl:for-each>
+
+  </body>
+</html>
+</xsl:template>
+
+<xsl:template match="p">
+  <p><xsl:value-of select="."/></p><xsl:text>
+      </xsl:text>
+</xsl:template>
+
+<xsl:template match="ab:metadata">
+    <xsl:for-each select="ab:m">
+      <xsl:choose>
+        <xsl:when test="@key = 'dc.creator'">
+	  <meta>
+	    <xsl:attribute name="name">author</xsl:attribute>
+	    <xsl:attribute name="content">
+	    <xsl:value-of select="."/>
+	    </xsl:attribute>
+          </meta><xsl:text>
+	    </xsl:text>
+        </xsl:when>
+        <xsl:when test="@key = 'abiword.keywords'">
+	  <meta>
+	    <xsl:attribute name="name">keywords</xsl:attribute>
+	    <xsl:attribute name="content">
+	    <xsl:value-of select="."/>
+	    </xsl:attribute>
+          </meta><xsl:text>
+	    </xsl:text>
+        </xsl:when>
+        <xsl:when test="@key = 'dc.subject'">
+	  <meta>
+	    <xsl:attribute name="name">keywords</xsl:attribute>
+	    <xsl:attribute name="content">
+	    <xsl:value-of select="."/>
+	    </xsl:attribute>
+          </meta><xsl:text>
+	    </xsl:text>
+        </xsl:when>
+        <xsl:when test="@key = 'dc.description'">
+	  <meta>
+	    <xsl:attribute name="name">abstract</xsl:attribute>
+	    <xsl:attribute name="content">
+	    <xsl:value-of select="."/>
+	    </xsl:attribute>
+          </meta><xsl:text>
+	    </xsl:text>
+        </xsl:when>
+        <xsl:when test="@key = 'dc.title'">
+	  <title><xsl:value-of select="."/></title><xsl:text>
+	    </xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:for-each>
+</xsl:template>
+
+</xsl:stylesheet>
+EOF
+
+# exit normally
+exit 0

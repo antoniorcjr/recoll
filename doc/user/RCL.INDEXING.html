@@ -1,0 +1,111 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Chapter 2. Indexing</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="Recoll user manual"><link rel="up" href="index.html" title="Recoll user manual"><link rel="prev" href="RCL.INTRODUCTION.RECOLL.html" title="1.3. Recoll overview"><link rel="next" href="RCL.INDEXING.STORAGE.html" title="2.2. Index storage"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter 2. Indexing</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="RCL.INTRODUCTION.RECOLL.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="RCL.INDEXING.STORAGE.html">Next</a></td></tr></table><hr></div><div class="chapter" title="Chapter 2. Indexing"><div class="titlepage"><div><div><h2 class="title"><a name="RCL.INDEXING"></a>Chapter 2. Indexing</h2></div></div></div><div class="sect1" title="2.1. Introduction"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="RCL.INDEXING.INTRODUCTION"></a>2.1. Introduction</h2></div></div></div><p>Indexing is the process by which the set of documents is
+	analyzed and the data entered into the database. <span class="application">Recoll</span>
+	indexing is normally incremental: documents will only be
+	processed if they have been modified since the last run. On
+	the first execution, all documents will need processing. A
+	full index build can be forced later by specifying an option
+	to the indexing command (<span class="command"><strong>recollindex</strong></span>
+	<code class="option">-z</code> or <code class="option">-Z</code>).</p><p>The following sections give an overview of different
+	aspects of the indexing processes and configuration, with links
+	to detailed sections.</p><div class="sect2" title="2.1.1. Indexing modes"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.INDEXING.INTRODUCTION.MODES"></a>2.1.1. Indexing modes</h3></div></div></div><p><span class="application">Recoll</span> indexing can be performed along two different modes:
+	  </p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p title="Periodic (or batch) indexing:"><b><a class="link" href="RCL.INDEXING.PERIODIC.html" title="2.7. Periodic indexing">
+		    Periodic (or batch) indexing:</a> </b>indexing takes place at discrete
+		  times, by executing the <span class="command"><strong>recollindex</strong></span>
+		  command. The typical usage is to have a nightly indexing run 
+		  <a class="link" href="RCL.INDEXING.PERIODIC.html#RCL.INDEXING.PERIODIC.AUTOMAT" title="2.7.2. Using cron to automate indexing">
+		    programmed</a> into
+		    your <span class="command"><strong>cron</strong></span> file.</p></li><li class="listitem"><p title="Real time indexing:"><b><a class="link" href="RCL.INDEXING.MONITOR.html" title="2.8. Real time indexing">Real
+		    time indexing:</a> </b>indexing takes place as soon as a file is created or
+		  changed. <span class="command"><strong>recollindex</strong></span> runs as a daemon
+		  and uses a file system alteration monitor such as 
+		  <span class="application">inotify</span>, 
+		  <span class="application">Fam</span> or
+		  <span class="application">Gamin</span>
+		  to detect file changes.</p></li></ul></div><p>
+	</p><p>The choice between the two methods is mostly a matter of
+          preference, and they can be combined by setting up multiple
+          indexes (ie: use periodic indexing on a big documentation
+          directory, and real time indexing on a small home
+          directory). Monitoring a big file system tree can consume
+          significant system resources.</p><p>The choice of method and the parameters used can be
+        configured from the <span class="command"><strong>recoll</strong></span> GUI:
+	  <span class="guimenu">Preferences</span> &#8594; <span class="guimenuitem">Indexing schedule</span>
+         </p></div><div class="sect2" title="2.1.2. Configurations, multiple indexes"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.INDEXING.INTRODUCTION.CONFIG"></a>2.1.2. Configurations, multiple indexes</h3></div></div></div><p>The parameters describing what is to be indexed and
+	  local preferences are defined in text files contained in a
+	  <a class="link" href="RCL.INDEXING.CONFIG.html" title="2.3. Index configuration">configuration
+	  directory</a>.</p><p>All parameters have defaults, defined in system-wide
+	  files.</p><p>Without further configuration, <span class="application">Recoll</span> will index all
+          appropriate files from your home directory, with a reasonable
+          set of defaults.</p><p>A default personal configuration directory
+	  (<code class="filename">$HOME/.recoll/</code>) is created
+	  when a <span class="application">Recoll</span> program is first executed. It is possible to
+	  create other configuration directories, and use them by
+	  setting the <code class="envar">RECOLL_CONFDIR</code> environment
+	  variable, or giving the <code class="option">-c</code> option to any of
+	  the <span class="application">Recoll</span> commands.</p><p>In some cases, it may be interesting to index different
+	  areas of the file system to separate databases. You can do this
+	  by using multiple configuration directories, each indexing a
+	  file system area to a specific database. Typically, this
+	  would be done to separate personal and shared
+          indexes, or to take advantage of the organization of your data
+          to improve search precision.</p><p>The generated indexes can
+          be queried concurrently in a transparent manner.</p><p>For index generation, multiple configurations are
+          totally independant from each other. When multiple indexes need
+          to be used for a single search,
+	  <a class="link" href="RCL.INDEXING.CONFIG.html#RCL.INDEXING.CONFIG.MULTIPLE" title="2.3.1. Multiple indexes">some parameters
+          should be consistent among the configurations</a>.</p></div><div class="sect2" title="2.1.3. Document types"><div class="titlepage"><div><div><h3 class="title"><a name="idp6837856"></a>2.1.3. Document types</h3></div></div></div><p><span class="application">Recoll</span> knows about quite a few different document
+          types. The parameters for document types recognition and
+          processing are set in 
+          <a class="link" href="RCL.INDEXING.CONFIG.html" title="2.3. Index configuration">configuration files</a>.</p><p>Most file types, like HTML or word processing files, only hold
+          one document. Some file types, like email folders or zip
+          archives, can hold many individually indexed documents, which may
+          themselves be compound ones. Such hierarchies can go quite
+          deep, and <span class="application">Recoll</span> can process, for example, a
+          <span class="application">LibreOffice</span> 
+          document stored as an attachment to an email message inside an
+          email folder archived in a zip file...</p><p><span class="application">Recoll</span> indexing processes plain text, HTML, OpenDocument
+          (Open/LibreOffice), email formats, and a few others internally.</p><p>Other file types (ie: postscript, pdf, ms-word, rtf ...) 
+          need external applications for preprocessing. The list is in the
+          <a class="link" href="RCL.INSTALL.EXTERNAL.html" title="5.2. Supporting packages"> installation</a>
+          section. After every indexing operation, <span class="application">Recoll</span> updates a list of
+          commands that would be needed for indexing existing files
+          types. This list can be displayed by selecting the menu option
+	  <span class="guimenu">File</span> &#8594; <span class="guimenuitem">Show Missing Helpers</span>
+          in the <span class="command"><strong>recoll</strong></span> GUI. It is stored in the
+          <code class="filename">missing</code> text file inside the configuration
+          directory.</p><p>By default, <span class="application">Recoll</span> will try to index any file type that
+          it has a way to read. This is sometimes not desirable, and
+          there are ways to either exclude some types, or on the
+          contrary to define a positive list of types to be
+          indexed. In the latter case, any type not in the list will
+          be ignored.</p><p>Excluding types can be done by adding wildcard name
+          patterns to the <code class="literal">skippedNames</code> list, which
+          can be done from the GUI Index configuration menu. For
+          versions 1.20 and later, you can alternatively set the
+          <code class="literal">excludedmimetypes</code> list in the
+          configuration file. This can be redefined for
+          subdirectories.</p><p>You can also define an exclusive list of MIME types to be indexed (no others will be indexed), by settting
+            the <code class="literal">indexedmimetypes</code> configuration
+            variable. Example:</p><pre class="programlisting">
+indexedmimetypes = text/html application/pdf
+          </pre><p>
+          It is possible to redefine this parameter for
+          subdirectories. Example:</p><pre class="programlisting">
+[/path/to/my/dir]
+indexedmimetypes = application/pdf
+          </pre><p>
+          (When using sections like this, don't forget that they remain
+          in effect until the end of the file or another section
+          indicator).</p><p><code class="literal">excludedmimetypes</code> or
+          <code class="literal">indexedmimetypes</code>, can be set either by
+          editing the <a class="link" href="RCL.INSTALL.CONFIG.html#RCL.INSTALL.CONFIG.RECOLLCONF" title="5.4.1. The main configuration file, recoll.conf">
+          main configuration file
+          (<code class="filename">recoll.conf</code>)</a>, or from the GUI
+          index configuration tool.</p></div><div class="sect2" title="2.1.4. Recovery"><div class="titlepage"><div><div><h3 class="title"><a name="idp6857536"></a>2.1.4. Recovery</h3></div></div></div><p>In the rare case where the index becomes corrupted (which can
+	  signal itself by weird search results or crashes), the index files
+	  need to be erased before restarting a clean indexing pass. Just delete
+	  the <code class="filename">xapiandb</code> directory (see 
+	  <a class="link" href="RCL.INDEXING.STORAGE.html" title="2.2. Index storage">next section</a>), or, 
+	  alternatively, start the next <span class="command"><strong>recollindex</strong></span> with the 
+	  <code class="option">-z</code> option, which will reset the database before
+	  indexing.</p></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="RCL.INTRODUCTION.RECOLL.html">Prev</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="RCL.INDEXING.STORAGE.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">1.3. Recoll overview </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 2.2. Index storage</td></tr></table></div></body></html>

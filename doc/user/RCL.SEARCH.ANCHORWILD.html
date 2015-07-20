@@ -1,0 +1,72 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>3.7. Anchored searches and wildcards</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="Recoll user manual"><link rel="up" href="RCL.SEARCH.html" title="Chapter 3. Searching"><link rel="prev" href="RCL.SEARCH.CASEDIAC.html" title="3.6. Search case and diacritics sensitivity"><link rel="next" href="RCL.SEARCH.DESKTOP.html" title="3.8. Desktop integration"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">3.7. Anchored searches and wildcards</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="RCL.SEARCH.CASEDIAC.html">Prev</a> </td><th width="60%" align="center">Chapter 3. Searching</th><td width="20%" align="right"> <a accesskey="n" href="RCL.SEARCH.DESKTOP.html">Next</a></td></tr></table><hr></div><div class="sect1" title="3.7. Anchored searches and wildcards"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="RCL.SEARCH.ANCHORWILD"></a>3.7. Anchored searches and wildcards</h2></div></div></div><p>Some special characters are interpreted by <span class="application">Recoll</span> in search
+      strings to expand or specialize the search. Wildcards expand a root
+      term in controlled ways. Anchor characters can restrict a search to
+      succeed only if the match is found at or near the beginning of the
+      document or one of its fields.</p><div class="sect2" title="3.7.1. More about wildcards"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.SEARCH.WILDCARDS"></a>3.7.1. More about wildcards</h3></div></div></div><p>All words entered in <span class="application">Recoll</span> search fields will be processed
+      for wildcard expansion before the request is finally
+      executed.</p><p>The wildcard characters are:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p><code class="literal">*</code> which matches 0 or more 
+        characters.</p></li><li class="listitem"><p><code class="literal">?</code> which matches
+           a single character.</p></li><li class="listitem"><p><code class="literal">[]</code> which allow
+         defining sets of characters to be matched (ex:
+         <code class="literal">[</code><strong class="userinput"><code>abc</code></strong><code class="literal">]</code> 
+          matches a single character which may be 'a' or 'b' or 'c',
+         <code class="literal">[</code><strong class="userinput"><code>0-9</code></strong><code class="literal">]</code>
+         matches any number.</p></li></ul></div><p>You should be aware of a few things when using
+        wildcards.</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>Using a wildcard character at the beginning of
+            a word can make for a slow search because <span class="application">Recoll</span> will have to
+            scan the whole index term list to find the
+            matches. However, this is much less a problem for field
+            searches, and queries
+            like <em class="replaceable"><code>author:*@domain.com</code></em> can
+            sometimes be very useful.</p></li><li class="listitem"><p>For <span class="application">Recoll</span> version 18 only, when working with a
+            raw index (preserving character case and diacritics), the
+            literal part of a wildcard expression will be matched
+            exactly for case and diacritics. This is not true any
+            more for versions 19 and later.</p></li><li class="listitem"><p>Using a <code class="literal">*</code> at the end of a
+            word can produce more matches than you would think, and
+            strange search results. You can use the 
+            <a class="link" href="RCL.SEARCH.html#RCL.SEARCH.GUI.TERMEXPLORER" title="3.1.9. The term explorer tool">term 
+              explorer</a> tool to check what completions exist for
+            a given term. You can also see exactly what search was
+            performed by clicking on the link at the top of the result
+            list. In general, for natural language terms, stem
+            expansion will produce better results than an
+            ending <code class="literal">*</code> (stem expansion is turned off
+            when any wildcard character appears in the
+            term).</p></li></ul></div><div class="sect3" title="3.7.1.1. Wildcards and path filtering"><div class="titlepage"><div><div><h4 class="title"><a name="RCL.SEARCH.WILDCARDS.PATH"></a>3.7.1.1. Wildcards and path filtering</h4></div></div></div><p>Due to the way that <span class="application">Recoll</span> processes wildcards
+          inside <code class="literal">dir</code> path filtering clauses, they
+          will have a multiplicative effect on the query size. A clause
+          containg wildcards in several paths elements, like, for
+          example,
+          <code class="literal">dir:</code><em class="replaceable"><code>/home/me/*/*/docdir</code></em>,
+          will almost certainly fail if your indexed tree is of any realistic
+          size.</p><p>Depending on the case, you may be able to work around
+        the issue by specifying the paths elements more narrowly, with
+          a constant prefix, or by using 2
+          separate <code class="literal">dir:</code> clauses instead of multiple
+          wildcards, as
+          in <code class="literal">dir:</code><em class="replaceable"><code>/home/me</code></em> <code class="literal">dir:</code><em class="replaceable"><code>docdir</code></em>. The
+          latter query is not equivalent to the initial one because it
+          does not specify a number of directory levels, but that's
+          the best we can do (and it may be actually more useful in
+          some cases).</p></div></div><div class="sect2" title="3.7.2. Anchored searches"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.SEARCH.ANCHOR"></a>3.7.2. Anchored searches</h3></div></div></div><p>Two characters are used to specify that a search hit should
+        occur at the beginning or at the end of the
+        text. <code class="literal">^</code> at the beginning of a term or phrase
+        constrains the search to happen at the start, <code class="literal">$</code>
+        at the end force it to happen at the end.</p><p>As this function is implemented as a phrase search it is
+        possible to specify a maximum distance at which the hit should
+        occur, either through the controls of the advanced search panel, or
+        using the query language, for example, as in:
+        </p><pre class="programlisting">"^someterm"o10</pre><p> which would force
+        <code class="literal">someterm</code> to be found within 10 terms of the
+        start of the text. This can be combined with a field search as in
+        <code class="literal">somefield:"^someterm"o10</code> or
+        <code class="literal">somefield:someterm$</code>.</p><p>This feature can also be used with an actual phrase search,
+        but in this case, the distance applies to the whole phrase and
+        anchor, so that, for example, <code class="literal">bla bla my unexpected
+        term</code> at the beginning of the text would be a match for
+        <code class="literal">"^my term"o5</code>.</p><p>Anchored searches can be very useful for searches inside
+        somewhat structured documents like scientific articles, in case
+        explicit metadata has not been supplied (a most frequent case), for
+        example for looking for matches inside the abstract or the list of
+        authors (which occur at the top of the document).</p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="RCL.SEARCH.CASEDIAC.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="RCL.SEARCH.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="RCL.SEARCH.DESKTOP.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">3.6. Search case and diacritics sensitivity </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 3.8. Desktop integration</td></tr></table></div></body></html>

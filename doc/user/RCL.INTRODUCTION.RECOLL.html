@@ -1,0 +1,95 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>1.3. Recoll overview</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="Recoll user manual"><link rel="up" href="RCL.INTRODUCTION.html" title="Chapter 1. Introduction"><link rel="prev" href="RCL.INTRODUCTION.SEARCH.html" title="1.2. Full text search"><link rel="next" href="RCL.INDEXING.html" title="Chapter 2. Indexing"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">1.3. Recoll overview</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="RCL.INTRODUCTION.SEARCH.html">Prev</a> </td><th width="60%" align="center">Chapter 1. Introduction</th><td width="20%" align="right"> <a accesskey="n" href="RCL.INDEXING.html">Next</a></td></tr></table><hr></div><div class="sect1" title="1.3. Recoll overview"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="RCL.INTRODUCTION.RECOLL"></a>1.3. Recoll overview</h2></div></div></div><p><span class="application">Recoll</span> uses the 
+      <a class="ulink" href="http://www.xapian.org" target="_top"><span class="application">Xapian</span></a> information retrieval
+      library as its storage and retrieval engine. <span class="application">Xapian</span> is a very
+      mature package using <a class="ulink" href="http://www.xapian.org/docs/intro_ir.html" target="_top">a sophisticated
+      probabilistic ranking model</a>.</p><p>The <span class="application">Xapian</span> library manages an index database which
+      describes where terms appear in your document files. It
+      efficiently processes the complex queries which are produced by
+      the <span class="application">Recoll</span> query expansion mechanism, and is in charge of the
+      all-important relevance computation task.</p><p><span class="application">Recoll</span> provides the mechanisms and interface to get data
+      into and out of the index. This includes translating the many
+      possible document formats into pure text, handling term
+      variations (using <span class="application">Xapian</span> stemmers), and spelling approximations
+      (using the <span class="application">aspell</span> speller),
+      interpreting user queries and presenting results.</p><p>In a shorter way, <span class="application">Recoll</span> does the dirty footwork, <span class="application">Xapian</span>
+      deals with the intelligent parts of the process.</p><p>The <span class="application">Xapian</span> index can be big (roughly the size of the
+        original document set), but it is not a document
+        archive. <span class="application">Recoll</span> can only display documents that still exist at
+        the place from which they were indexed. (Actually, there is a
+        way to reconstruct a document from the information in the
+        index, but the result is not nice, as all formatting,
+        punctuation and capitalization are lost).</p><p><span class="application">Recoll</span> stores all internal data in <span class="application">Unicode
+      UTF-8</span> format, and it can index files of many types
+      with different character sets, encodings, and languages into the
+      same index. It can process documents embedded inside other
+      documents (for example a pdf document stored inside a Zip
+      archive sent as an email attachment...), down to an arbitrary
+      depth.</p><p>Stemming is the process by which <span class="application">Recoll</span> reduces words to
+        their radicals so that searching does not depend, for example, on a
+        word being singular or plural (floor, floors), or on a verb tense
+        (flooring, floored). Because the mechanisms used for stemming
+        depend on the specific grammatical rules for each language, there
+        is a separate <span class="application">Xapian</span> stemmer module for most common languages where
+        stemming makes sense.</p><p><span class="application">Recoll</span> stores the unstemmed versions of terms in the main index
+        and uses auxiliary databases for term expansion (one for each
+        stemming language), which means that you can switch stemming
+        languages between searches, or add a language without needing a
+        full reindex.</p><p>Storing documents written in different languages in the same
+        index is possible, and commonly done. In this situation, you can
+        specify several stemming languages for the index. </p><p><span class="application">Recoll</span> currently makes no attempt at automatic language
+        recognition, which means that the stemmer will sometimes be applied
+        to terms from other languages with potentially strange results. In
+        practise, even if this introduces possibilities of confusion, this
+        approach has been proven quite useful, and it is much less
+        cumbersome than separating your documents according to what
+        language they are written in.</p><p>Before version 1.18, <span class="application">Recoll</span> stripped most accents and
+        diacritics from terms, and converted them to lower case before
+        either storing them in the index or searching for them. As a
+        consequence, it was impossible to search for a particular
+        capitalization of a term (<code class="literal">US</code> /
+        <code class="literal">us</code>), or to discriminate two terms based on
+        diacritics (<code class="literal">sake</code> / <code class="literal">saké</code>, 
+        <code class="literal">mate</code> / <code class="literal">maté</code>).</p><p>As of version 1.18, <span class="application">Recoll</span> can optionally store the raw terms,
+        without accent stripping or case conversion. In this configuration,
+        it is still possible (and most common) for a query to be
+        insensitive to case and/or diacritics. Appropriate term expansions
+        are performed before actually accessing the main index. This is
+        described in more detail in the <a class="link" href="RCL.INDEXING.CONFIG.html#RCL.INDEXING.CONFIG.SENS" title="2.3.2. Index case and diacritics sensitivity">section about index case and
+        diacritics sensitivity</a>.</p><p><span class="application">Recoll</span> has many parameters which define exactly what to
+        index, and how to classify and decode the source
+        documents. These are kept in <a class="link" href="RCL.INDEXING.CONFIG.html" title="2.3. Index configuration">configuration files</a>. A
+        default configuration is copied into a standard location
+        (usually something like
+        <code class="filename">/usr/[local/]share/recoll/examples</code>)
+        during installation. The default values set by the
+        configuration files in this directory may be overridden by
+        values that you set inside your personal configuration, found
+        by default in the <code class="filename">.recoll</code> sub-directory
+        of your home directory.  The default configuration will index
+        your home directory with default parameters and should be
+        sufficient for giving <span class="application">Recoll</span> a try, but you may want to adjust
+        it later, which can be done either by editing the text files
+        or by using configuration menus in the
+        <span class="command"><strong>recoll</strong></span> GUI. Some other parameters affecting only
+        the <span class="command"><strong>recoll</strong></span> GUI are stored in the standard
+        location defined by <span class="application">Qt</span>.</p><p>The <a class="link" href="RCL.INDEXING.PERIODIC.html#RCL.INDEXING.PERIODIC.EXEC" title="2.7.1. Running indexing">indexing
+          process</a> is started automatically the first time you
+        execute the <span class="command"><strong>recoll</strong></span> GUI. Indexing can also
+        be performed by executing the <span class="command"><strong>recollindex</strong></span>
+        command. <span class="application">Recoll</span> indexing is multithreaded by default when
+        appropriate hardware resources are available, and can perform
+        in parallel multiple tasks among text extraction, segmentation
+        and index updates.</p><p><a class="link" href="RCL.SEARCH.html" title="Chapter 3. Searching">Searches</a> are usually
+        performed inside the <span class="command"><strong>recoll</strong></span> GUI, which has many
+        options to help you find what you are looking for. However, there
+        are other ways to perform <span class="application">Recoll</span> searches: mostly a <a class="link" href="RCL.SEARCH.COMMANDLINE.html" title="3.3. Searching on the command line">
+          command line interface</a>, a 
+        <a class="link" href="RCL.PROGRAM.API.html#RCL.PROGRAM.API.PYTHON" title="4.3.2. Python interface">
+          <span class="application">Python</span>
+          programming interface</a>, a <a class="link" href="RCL.SEARCH.KIO.html" title="3.2. Searching with the KDE KIO slave">
+          <span class="application">KDE</span> KIO slave module</a>, and
+        Ubuntu Unity <a class="ulink" href="https://bitbucket.org/medoc/unity-lens-recoll" target="_top">
+        Lens</a> (for older versions) or 
+        <a class="ulink" href="https://bitbucket.org/medoc/unity-scope-recoll" target="_top">
+          Scope</a> (for current versions) modules.
+        </p></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="RCL.INTRODUCTION.SEARCH.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="RCL.INTRODUCTION.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="RCL.INDEXING.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">1.2. Full text search </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Chapter 2. Indexing</td></tr></table></div></body></html>

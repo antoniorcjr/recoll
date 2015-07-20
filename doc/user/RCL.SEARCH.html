@@ -1,0 +1,882 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Chapter 3. Searching</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="Recoll user manual"><link rel="up" href="index.html" title="Recoll user manual"><link rel="prev" href="RCL.INDEXING.MONITOR.html" title="2.8. Real time indexing"><link rel="next" href="RCL.SEARCH.KIO.html" title="3.2. Searching with the KDE KIO slave"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter 3. Searching</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="RCL.INDEXING.MONITOR.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="RCL.SEARCH.KIO.html">Next</a></td></tr></table><hr></div><div class="chapter" title="Chapter 3. Searching"><div class="titlepage"><div><div><h2 class="title"><a name="RCL.SEARCH"></a>Chapter 3. Searching</h2></div></div></div><div class="sect1" title="3.1. Searching with the Qt graphical user interface"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="RCL.SEARCH.GUI"></a>3.1. Searching with the Qt graphical user interface</h2></div></div></div><p>The <span class="command"><strong>recoll</strong></span> program provides the main user
+      interface for searching. It is based on the
+      <span class="application">Qt</span> library.</p><p><span class="command"><strong>recoll</strong></span> has two search modes:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>Simple search (the default, on the main screen) has
+        a single entry field where you can enter multiple words.</p></li><li class="listitem"><p>Advanced search (a panel accessed through the
+        <span class="guilabel">Tools</span> menu or the toolbox bar icon) has
+        multiple entry fields, which you may use to build a logical
+        condition, with additional filtering on file type, location
+        in the file system, modification date, and size.</p></li></ul></div><p>In most cases, you can enter the terms as you
+        think them, even if they contain embedded punctuation or other
+        non-textual characters. For
+        example, <span class="application">Recoll</span> can handle things like email addresses, or
+        arbitrary cut and paste from another text window, punctation
+        and all.</p><p>The main case where you should enter text differently from
+      how it is printed is for east-asian languages (Chinese,
+      Japanese, Korean). Words composed of single or multiple
+      characters should be entered separated by white space in this
+      case (they would typically be printed without white
+      space).</p><div class="sect2" title="3.1.1. Simple search"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.SEARCH.GUI.SIMPLE"></a>3.1.1. Simple search</h3></div></div></div><div class="procedure"><ol class="procedure" type="1"><li class="step" title="Step 1"><p>Start the <span class="command"><strong>recoll</strong></span> program.</p></li><li class="step" title="Step 2"><p>Possibly choose a search mode: <span class="guilabel">Any
+        term</span>, <span class="guilabel">All terms</span>, 
+        <span class="guilabel">File name</span> or
+        <span class="guilabel">Query language</span>.</p></li><li class="step" title="Step 3"><p>Enter search term(s) in the text field at the top of the
+        window.</p></li><li class="step" title="Step 4"><p>Click the <span class="guilabel">Search</span> button or
+        hit the <span class="keycap"><strong>Enter</strong></span> key to start the search.</p></li></ol></div><p>The initial default search mode is <span class="guilabel">Query
+        language</span>. Without special directives, this will look for
+        documents containing all of the search terms (the ones with more
+        terms will get better scores), just like the <span class="guilabel">All
+        terms</span> mode which will ignore such
+        directives. <span class="guilabel">Any term</span> will search for documents
+        where at least one of the terms appear. </p><p>The <span class="guilabel">Query Language</span> features are
+      described in <a class="link" href="RCL.SEARCH.LANG.html" title="3.5. The query language">a separate
+      section</a>.</p><p>All search modes allow wildcards inside terms
+        (<code class="literal">*</code>, <code class="literal">?</code>,
+        <code class="literal">[]</code>). You may want to have a look at the
+        <a class="link" href="RCL.SEARCH.ANCHORWILD.html#RCL.SEARCH.WILDCARDS" title="3.7.1. More about wildcards">section about wildcards</a>
+        for more information about this.</p><p><span class="guilabel">File name</span> will specifically look for file
+        names. The point of having a separate file name
+        search is that wild card expansion can be performed more
+        efficiently on a small subset of the index (allowing
+        wild cards on the left of terms without excessive penality).
+        Things to know:
+        </p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>White space in the entry should match white
+            space in the file name, and is not treated specially.</p></li><li class="listitem"><p>The search is insensitive to character case and
+            accents, independantly of the type of index.</p></li><li class="listitem"><p>An entry without any wild card
+            character and not capitalized will be prepended and appended
+            with '*' (ie: <em class="replaceable"><code>etc</code></em> -&gt;
+            <em class="replaceable"><code>*etc*</code></em>, but
+            <em class="replaceable"><code>Etc</code></em> -&gt;
+            <em class="replaceable"><code>etc</code></em>).</p></li><li class="listitem"><p>If you have a big index (many files),
+            excessively generic fragments may result in inefficient
+            searches.</p></li></ul></div><p>
+      </p><p>You can search for exact phrases (adjacent words in a
+      given order) by enclosing the input inside double quotes. Ex:
+     <code class="literal">"virtual reality"</code>.</p><p>When using a stripped index, character case has no influence on
+      search, except that you can disable stem expansion for any term by
+      capitalizing it. Ie: a search for <code class="literal">floor</code> will also
+      normally look for <code class="literal">flooring</code>,
+      <code class="literal">floored</code>, etc., but a search for
+      <code class="literal">Floor</code> will only look for <code class="literal">floor</code>,
+      in any character case. Stemming can also be disabled globally in the
+      preferences. When using a raw index, <a class="link" href="RCL.SEARCH.CASEDIAC.html" title="3.6. Search case and diacritics sensitivity">the rules are a bit more
+      complicated</a>.</p><p><span class="application">Recoll</span> remembers the last few searches that you
+        performed. You can use the simple search text entry widget (a
+        combobox) to recall them (click on the thing at the right of the
+        text field). Please note, however, that only the search texts
+        are remembered, not the mode (all/any/file name).</p><p>Typing <span class="keycap"><strong>Esc</strong></span> <span class="keycap"><strong>Space</strong></span> while
+        entering a word in the simple search entry will open a window
+        with possible completions for the word. The completions are
+        extracted from the database.</p><p>Double-clicking on a word in the result list or a preview
+      window will insert it into the simple search entry field.</p><p>You can cut and paste any text into an <span class="guilabel">All
+      terms</span> or <span class="guilabel">Any term</span> search field,
+      punctuation, newlines and all - except for wildcard characters
+      (single <code class="literal">?</code> characters are ok). <span class="application">Recoll</span> will process
+      it and produce a meaningful search. This is what most differentiates
+      this mode from the <span class="guilabel">Query Language</span> mode, where
+      you have to care about the syntax.</p><p>You can use the <a class="link" href="RCL.SEARCH.html#RCL.SEARCH.GUI.COMPLEX" title="3.1.8. Complex/advanced search">
+      <span class="guimenu">Tools</span> &#8594; <span class="guimenuitem">Advanced search</span>
+      </a> dialog for more complex searches.</p></div><div class="sect2" title="3.1.2. The default result list"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.SEARCH.GUI.RESLIST"></a>3.1.2. The default result list</h3></div></div></div><p>After starting a search, a list of results will instantly
+       be displayed in the main list window.</p><p>By default, the document list is presented in order of
+       relevance (how well the system estimates that the document
+       matches the query). You can sort the result by ascending or
+       descending date by using the vertical arrows in the toolbar.</p><p>Clicking on the
+       <code class="literal">Preview</code> link for an entry will open an
+       internal preview window for the document. Further
+       <code class="literal">Preview</code> clicks for the same search will open
+       tabs in the existing preview window. You can use
+       <span class="keycap"><strong>Shift</strong></span>+Click to force the creation of another
+       preview window, which may be useful to view the documents side
+       by side. (You can also browse successive results in a single
+       preview window by typing
+       <span class="keycap"><strong>Shift</strong></span>+<span class="keycap"><strong>ArrowUp/Down</strong></span> in the
+       window).</p><p>Clicking the <code class="literal">Open</code> link will
+       start an external viewer for the document. By default, <span class="application">Recoll</span> lets
+       the desktop choose the appropriate application for most document
+       types (there is a short list of exceptions, see further). If you
+       prefer to completely customize the choice of applications, you can
+       uncheck the <span class="guilabel">Use desktop preferences</span> option in
+       the GUI preferences dialog, and click the <span class="guilabel">Choose editor
+       applications</span> button to adjust the predefined <span class="application">Recoll</span>
+       choices. The tool accepts multiple selections of MIME types (e.g. to
+       set up the editor for the dozens of office file types).</p><p>Even when <span class="guilabel">Use desktop preferences</span> is
+        checked, there is a small list of exceptions, for MIME types where
+        the <span class="application">Recoll</span> choice should override the desktop one. These are
+        applications which are well integrated with <span class="application">Recoll</span>, especially
+        <span class="application">evince</span> for viewing PDF and Postscript
+        files because of its support for opening the document at a specific
+        page and passing a search string as an argument. Of course, you can
+        edit the list (in the GUI preferences) if you would prefer to lose
+        the functionality and use the standard desktop tool.</p><p>You may also change the choice of applications by editing the
+       <a class="link" href="RCL.INSTALL.CONFIG.html#RCL.INSTALL.CONFIG.MIMEVIEW" title="5.4.5. The mimeview file">
+       <code class="filename">mimeview</code></a> configuration file if you find
+       this more convenient.</p><p>Each result entry also has a right-click menu with an
+       <span class="guilabel">Open With</span> entry. This lets you choose an
+       application from the list of those which registered with the desktop
+       for the document MIME type.</p><p>The <code class="literal">Preview</code> and <code class="literal">Open</code>
+       edit links may not be present for all entries, meaning that
+       <span class="application">Recoll</span> has no configured way to preview a given file type (which
+       was indexed by name only), or no configured external editor for
+       the file type. This can sometimes be adjusted simply by tweaking
+       the <a class="link" href="RCL.INSTALL.CONFIG.html#RCL.INSTALL.CONFIG.MIMEMAP" title="5.4.3. The mimemap file">
+             <code class="filename">mimemap</code></a> and  
+       <a class="link" href="RCL.INSTALL.CONFIG.html#RCL.INSTALL.CONFIG.MIMEVIEW" title="5.4.5. The mimeview file">
+       <code class="filename">mimeview</code></a> configuration files (the latter
+       can be modified with the user preferences dialog).</p><p>The format of the result list entries is entirely
+      configurable by using the preference dialog to 
+      <a class="link" href="RCL.SEARCH.html#RCL.SEARCH.GUI.CUSTOM.RESLIST" title="3.1.14.1. The result list format">edit an HTML
+      fragment</a>.</p><p>You can click on the <code class="literal">Query details</code> link
+        at the top of the results page to see the query actually 
+        performed, after stem expansion and other processing.</p><p>Double-clicking on any word inside the result list or a
+      preview window will insert it into the simple search text.</p><p>The result list is divided into pages (the size of which
+       you can change in the preferences). Use the arrow buttons in the
+       toolbar or the links at the bottom of the page to browse the
+       results.</p><div class="sect3" title="3.1.2.1. No results: the spelling suggestions"><div class="titlepage"><div><div><h4 class="title"><a name="RCL.SEARCH.GUI.RESLIST.SUGGS"></a>3.1.2.1. No results: the spelling suggestions</h4></div></div></div><p>When a search yields no result, and if the
+          <span class="application">aspell</span> dictionary is configured, <span class="application">Recoll</span>
+          will try to check for misspellings among the query terms, and
+          will propose lists of replacements. Clicking on one of the
+          suggestions will replace the word and restart the search. You can
+          hold any of the modifier keys (Ctrl, Shift, etc.) while clicking
+          if you would rather stay on the suggestion screen because several
+          terms need replacement.</p></div><div class="sect3" title="3.1.2.2. The result list right-click menu"><div class="titlepage"><div><div><h4 class="title"><a name="RCL.SEARCH.GUI.RESULTLIST.MENU"></a>3.1.2.2. The result list right-click menu</h4></div></div></div><p>Apart from the preview and edit links, you can display a
+          pop-up menu by right-clicking over a paragraph in the result
+         list. This menu has the following entries:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p><span class="guilabel">Preview</span></p></li><li class="listitem"><p><span class="guilabel">Open</span></p></li><li class="listitem"><p><span class="guilabel">Open With</span></p></li><li class="listitem"><p><span class="guilabel">Run Script</span></p></li><li class="listitem"><p><span class="guilabel">Copy File Name</span></p></li><li class="listitem"><p><span class="guilabel">Copy Url</span></p></li><li class="listitem"><p><span class="guilabel">Save to File</span></p></li><li class="listitem"><p><span class="guilabel">Find similar</span></p></li><li class="listitem"><p><span class="guilabel">Preview Parent
+                document</span></p></li><li class="listitem"><p><span class="guilabel">Open Parent
+                document</span></p></li><li class="listitem"><p><span class="guilabel">Open Snippets
+                Window</span></p></li></ul></div><p>The <span class="guilabel">Preview</span> and
+          <span class="guilabel">Open</span> entries do the same thing as the 
+          corresponding links.</p><p><span class="guilabel">Open With</span> lets you open the document
+        with one of the applications claiming to be able to handle its MIME
+        type (the information comes from the <code class="literal">.desktop</code>
+        files in 
+        <code class="filename">/usr/share/applications</code>).</p><p><span class="guilabel">Run Script</span> allows starting an arbitrary
+        command on the result file. It will only appear for results which
+        are top-level files. See <a class="link" href="RCL.SEARCH.html#RCL.SEARCH.GUI.RUNSCRIPT" title="3.1.4. Running arbitrary commands on result files (1.20 and later)">further</a> for a more
+        detailed description.</p><p>The <span class="guilabel">Copy File Name</span> and
+        <span class="guilabel">Copy Url</span> copy the relevant data to the
+        clipboard, for later pasting.</p><p><span class="guilabel">Save to File</span> allows saving the
+        contents of a result document to a chosen file. This entry
+        will only appear if the document does not correspond to an
+        existing file, but is a subdocument inside such a file (ie: an
+        email attachment). It is especially useful to extract attachments
+        with no associated editor.</p><p>The <span class="guilabel">Open/Preview Parent document</span> entries
+        allow working with the higher level document (e.g. the email
+        message an attachment comes from). <span class="application">Recoll</span> is sometimes not totally
+        accurate as to what it can or can't do in this area.  For example
+        the <span class="guilabel">Parent</span> entry will also appear for an
+        email which is part of an mbox folder file, but you can't actually
+        visualize the mbox (there will be an error dialog if you
+        try).</p><p>If the document is a top-level file, <span class="guilabel">Open
+        Parent</span> will start the default file manager on the
+        enclosing filesystem directory.</p><p>The <span class="guilabel">Find similar</span> entry will select
+        a number of relevant term from the current document and enter
+        them into the simple search field. You can then start a simple
+        search, with a good chance of finding documents related to the
+        current result. I can't remember a single instance where this
+        function was actually useful to me...</p><p>The <span class="guilabel">Open Snippets Window</span> entry will only
+        appear for documents which support page breaks (typically
+        PDF, Postscript, DVI). The snippets window lists extracts from
+        the document, taken around search terms occurrences, along with the
+        corresponding page number, as links which can be used to start
+        the native viewer on the appropriate page. If the viewer supports
+        it, its search function will also be primed with one of the
+        search terms.</p></div></div><div class="sect2" title="3.1.3. The result table"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.SEARCH.GUI.RESTABLE"></a>3.1.3. The result table</h3></div></div></div><p>In <span class="application">Recoll</span> 1.15 and newer, the results can be displayed in 
+        spreadsheet-like fashion. You can switch to this presentation by
+        clicking the table-like icon in the toolbar (this is a toggle,
+        click again to restore the list).</p><p>Clicking on the column headers will allow sorting by the
+        values in the column. You can click again to invert the order, and
+        use the header right-click menu to reset sorting to the default
+        relevance order (you can also use the sort-by-date arrows to do
+        this).</p><p>Both the list and the table display the same underlying
+          results. The sort order set from the table is still active if you
+          switch back to the list mode. You can click twice on a date sort
+          arrow to reset it from there.</p><p>The header right-click menu allows adding or deleting
+          columns. The columns can be resized, and their order can be changed
+          (by dragging). All the changes are recorded when you quit
+          <span class="command"><strong>recoll</strong></span></p><p>Hovering over a table row will update the detail area at the
+        bottom of the window with the corresponding values. You can click
+        the row to freeze the display. The bottom area is equivalent to a
+        result list paragraph, with links for starting a preview or a
+        native application, and an equivalent right-click menu. Typing
+        <span class="keycap"><strong>Esc</strong></span> (the Escape key) will unfreeze the
+        display.</p></div><div class="sect2" title="3.1.4. Running arbitrary commands on result files (1.20 and later)"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.SEARCH.GUI.RUNSCRIPT"></a>3.1.4. Running arbitrary commands on result files (1.20 and later)</h3></div></div></div><p>Apart from the <span class="guilabel">Open</span> and <span class="guilabel">Open
+      With</span> operations, which allow starting an application on a
+      result document (or a temporary copy), based on its MIME type, it is
+      also possible to run arbitrary commands on results which are
+      top-level files, using the <span class="guilabel">Run Script</span> entry in
+      the results pop-up menu.</p><p>The commands which will appear in the <span class="guilabel">Run
+      Script</span> submenu must be defined by
+      <code class="literal">.desktop</code> files inside the
+      <code class="filename">scripts</code> subdirectory of the current
+      configuration directory.</p><p>Here follows an example of a <code class="literal">.desktop</code> file,
+      which could be named for example,
+      <code class="filename">~/.recoll/scripts/myscript.desktop</code> (the exact
+      file name inside the directory is irrelevant):
+      </p><pre class="programlisting">
+[Desktop Entry]
+Type=Application
+Name=MyFirstScript
+Exec=/home/me/bin/tryscript %F
+MimeType=*/*
+      </pre><p>
+      The <code class="literal">Name</code> attribute defines the label which will
+      appear inside the <span class="guilabel">Run Script</span> menu. The
+      <code class="literal">Exec</code> attribute defines the program to be run,
+      which does not need to actually be a script, of course. The
+      <code class="literal">MimeType</code> attribute is not used, but needs to exist.
+      </p><p>The commands defined this way can also be used from links
+      inside the <a class="link" href="RCL.SEARCH.html#RCL.SEARCH.GUI.CUSTOM.RESLIST.PARA" title="The paragraph format">
+      result paragraph</a>.</p><p>As an example, it might make sense to write a script which
+      would move the document to the trash and purge it from the <span class="application">Recoll</span>
+      index.</p></div><div class="sect2" title="3.1.5. Displaying thumbnails"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.SEARCH.GUI.THUMBNAILS"></a>3.1.5. Displaying thumbnails</h3></div></div></div><p>The default format for the result list entries and the
+          detail area of the result table display an icon for each result
+          document. The icon is either a generic one determined from the
+          MIME type, or a thumbnail of the document appearance. Thumbnails
+          are only displayed if found in the standard
+          <span class="application">freedesktop</span> location, where they would
+          typically have been created by a file manager.</p><p>Recoll has no capability to create thumbnails. A relatively
+        simple trick is to use the <span class="guilabel">Open parent
+        document/folder</span> entry in the result list popup
+        menu. This should open a file manager window on the containing
+        directory, which should in turn create the thumbnails (depending on
+        your settings). Restarting the search should then display the
+        thumbnails.</p><p>There are also <a class="ulink" href="http://bitbucket.org/medoc/recoll/wiki/ResultsThumbnails.wiki" target="_top">some
+          pointers about  thumbnail generation</a> on the <span class="application">Recoll</span> wiki.
+          </p></div><div class="sect2" title="3.1.6. The preview window"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.SEARCH.GUI.PREVIEW"></a>3.1.6. The preview window</h3></div></div></div><p>The preview window opens when you first click a
+      <code class="literal">Preview</code> link inside the result list.</p><p>Subsequent preview requests for a given search open new
+      tabs in the existing window (except if you hold the
+      <span class="keycap"><strong>Shift</strong></span> key while clicking which will open a new
+      window for side by side viewing).</p><p>Starting another search and requesting a preview will
+      create a new preview window. The old one stays open until you
+      close it.</p><p>You can close a preview tab by typing <span class="keycap"><strong>Ctrl-W</strong></span> 
+      (<span class="keycap"><strong>Ctrl</strong></span> + <span class="keycap"><strong>W</strong></span>) in the
+      window. Closing the last tab for a window will also close the
+      window.</p><p>Of course you can also close a preview window by using the
+	window manager button in the top of the frame.</p><p>You can display successive or previous documents from the
+      result list inside a preview tab by typing
+      <span class="keycap"><strong>Shift</strong></span>+<span class="keycap"><strong>Down</strong></span> or
+      <span class="keycap"><strong>Shift</strong></span>+<span class="keycap"><strong>Up</strong></span> (<span class="keycap"><strong>Down</strong></span>
+      and <span class="keycap"><strong>Up</strong></span> are the arrow keys).</p><p>A right-click menu in the text area allows switching
+	between displaying the main text or the contents of fields
+	associated to the document (ie: author, abtract, etc.). This is
+	especially useful in cases where the term match did not occur in
+	the main text but in one of the fields. In the case of
+	images, you can switch between three displays: the image
+	itself, the image metadata as extracted
+	by <span class="command"><strong>exiftool</strong></span> and the fields, which is the
+	metadata stored in the index.</p><p>You can print the current preview window contents by typing
+         <span class="keycap"><strong>Ctrl-P</strong></span> (<span class="keycap"><strong>Ctrl</strong></span> +
+         <span class="keycap"><strong>P</strong></span>) in  the window text.</p><div class="sect3" title="3.1.6.1. Searching inside the preview"><div class="titlepage"><div><div><h4 class="title"><a name="RCL.SEARCH.GUI.PREVIEW.SEARCH"></a>3.1.6.1. Searching inside the preview</h4></div></div></div><p>The preview window has an internal search capability,
+	  mostly controlled by the panel at the bottom of the window,
+	  which works in two modes: as a classical editor incremental
+	  search, where we look for the text entered in the entry
+	  zone, or as a way to walk the matches between the document
+	  and the <span class="application">Recoll</span> query that found it.</p><div class="variablelist"><dl><dt><span class="term">Incremental text search</span></dt><dd><p>The preview tabs have an internal incremental search
+		function. You initiate the search either by typing a
+		<span class="keycap"><strong>/</strong></span> (slash) or <span class="keycap"><strong>CTL-F</strong></span>
+		inside the text area or by clicking into
+		the <span class="guilabel">Search for:</span> text field and
+		entering the search string. You can then use the 
+		<span class="guilabel">Next</span>
+		and <span class="guilabel">Previous</span> buttons 
+		to find the next/previous occurrence. You can also type
+		<span class="keycap"><strong>F3</strong></span> inside the text area to get to the next
+		occurrence.</p><p>If you have a search string entered and you use
+		Ctrl-Up/Ctrl-Down to browse the results, the search is
+		initiated for each successive document. If the string is
+		found, the cursor will be positioned at the first
+		occurrence of the search string.</p></dd><dt><span class="term">Walking the match lists</span></dt><dd><p>If the entry area is empty when you click
+		the <span class="guilabel">Next</span>
+		or <span class="guilabel">Previous</span> buttons, the editor will
+		be scrolled to show the next match to any search term
+		(the next highlighted zone). If you select a search group
+		from the dropdown list and click <span class="guilabel">Next</span>
+		or <span class="guilabel">Previous</span>, the match list for this
+		group will be walked. This is not the same as a text
+		search, because the occurences will include non-exact
+		matches (as caused by stemming or wildcards). The search
+		will revert to the text mode as soon as you edit the
+		entry area.</p></dd></dl></div></div></div><div class="sect2" title="3.1.7. The Query Fragments window"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.SEARCH.GUI.FRAGBUTS"></a>3.1.7. The Query Fragments window</h3></div></div></div><p>Selecting the <span class="guimenu">Tools</span> &#8594; <span class="guimenuitem">Query Fragments</span> menu
+          entry will open a window with radio- and check-buttons which
+          can be used to activate query language fragments for
+          filtering the current query. This can be useful if you have
+          frequent reusable selectors, for example, filtering on
+          alternate directories, or searching just one category of
+          files, not covered by the standard category
+          selectors.</p><p>The contents of the window are entirely customizable, and
+      defined by the contents of the <code class="filename">fragbuts.xml</code>
+      file inside the configuration directory. The sample file
+      distributed with <span class="application">Recoll</span> (which you should be able to find under
+      <code class="filename">/usr/share/recoll/examples/fragbuts.xml</code>),
+      contains an example which filters the results from the WEB
+      history.</p><p>Here follows an example:
+</p><pre class="programlisting">
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+
+&lt;fragbuts version="1.0"&gt;
+
+  &lt;radiobuttons&gt;
+
+    &lt;fragbut&gt;
+      &lt;label&gt;Include Web Results&lt;/label&gt;
+      &lt;frag&gt;&lt;/frag&gt;
+    &lt;/fragbut&gt;
+
+    &lt;fragbut&gt;
+      &lt;label&gt;Exclude Web Results&lt;/label&gt;
+      &lt;frag&gt;-rclbes:BGL&lt;/frag&gt;
+    &lt;/fragbut&gt;
+
+    &lt;fragbut&gt;
+      &lt;label&gt;Only Web Results&lt;/label&gt;
+      &lt;frag&gt;rclbes:BGL&lt;/frag&gt;
+    &lt;/fragbut&gt;
+
+  &lt;/radiobuttons&gt;
+
+  &lt;buttons&gt;
+
+    &lt;fragbut&gt;
+      &lt;label&gt;Year 2010&lt;/label&gt;
+      &lt;frag&gt;date:2010-01-01/2010-12-31&lt;/frag&gt;
+    &lt;/fragbut&gt;
+
+    &lt;fragbut&gt;
+      &lt;label&gt;My Great Directory Only&lt;/label&gt;
+      &lt;frag&gt;dir:/my/great/directory&lt;/frag&gt;
+    &lt;/fragbut&gt;
+
+  &lt;/buttons&gt;
+&lt;/fragbuts&gt;
+</pre><p>
+      </p><p>Each <code class="literal">radiobuttons</code> or
+      <code class="literal">buttons</code> section defines a line of
+      checkbuttons or radiobuttons inside the window. Any number of
+      buttons can be selected, but the radiobuttons in a line are
+      exclusive.</p><p>Each <code class="literal">fragbut</code> section defines the label
+      for a button, and the Query Language fragment which will be
+      added (as an AND filter) before performing the query if the
+      button is active.</p><p>This feature is new in <span class="application">Recoll</span> 1.20, and will probably be
+      refined depending on user feedback.</p></div><div class="sect2" title="3.1.8. Complex/advanced search"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.SEARCH.GUI.COMPLEX"></a>3.1.8. Complex/advanced search</h3></div></div></div><p>The advanced search dialog helps you build more complex queries
+        without memorizing the search language constructs. It can be opened
+        through the <span class="guilabel">Tools</span> menu or through the main
+        toolbar.</p><p>The dialog has two tabs:</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>The first tab lets you specify terms to search
+          for, and permits specifying multiple clauses which are combined
+          to build the search.</p></li><li class="listitem"><p>The second tab lets filter the results according
+          to file size, date of modification, MIME type, or
+          location.</p></li></ol></div><p>Click on the <span class="guilabel">Start Search</span> button in
+        the advanced search dialog, or type <span class="keycap"><strong>Enter</strong></span> in
+        any text field to start the search. The button in
+        the main window always performs a simple search.</p><p>Click on the <code class="literal">Show query details</code> link at
+        the top of the result page to see the query expansion.</p><div class="sect3" title='3.1.8.1. Avanced search: the "find" tab'><div class="titlepage"><div><div><h4 class="title"><a name="RCL.SEARCH.GUI.COMPLEX.TERMS"></a>3.1.8.1. Avanced search: the "find" tab</h4></div></div></div><p>This part of the dialog lets you constructc a query by
+          combining multiple clauses of different types.  Each entry
+          field is configurable for the following modes:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>All terms.</p></li><li class="listitem"><p>Any term.</p></li><li class="listitem"><p>None of the terms.</p></li><li class="listitem"><p>Phrase (exact terms in order within an
+          adjustable window).</p></li><li class="listitem"><p>Proximity (terms in any order within an
+          adjustable window).</p></li><li class="listitem"><p>Filename search.</p></li></ul></div><p>Additional entry fields can be created by clicking the
+          <span class="guilabel">Add clause</span> button.</p><p>When searching, the non-empty clauses will be
+          combined either with an AND or an OR conjunction, depending on
+          the choice made on the left (<span class="guilabel">All clauses</span> or
+          <span class="guilabel">Any clause</span>).</p><p>Entries of all types except "Phrase" and "Near" accept
+          a mix of single words and phrases enclosed in double quotes. 
+          Stemming and wildcard expansion will be performed as for simple
+          search. </p><p title="Phrases and Proximity searches"><b>Phrases and Proximity searches. </b>These two clauses work in similar ways, with the
+      difference that proximity searches do not impose an order on the
+      words. In both cases, an adjustable number (slack) of non-matched words
+      may be accepted between the searched ones (use the counter on
+      the left to adjust this count). For phrases, the default count
+      is zero (exact match). For proximity it is ten (meaning that two search
+      terms, would be matched if found within a window of twelve
+      words). Examples: a phrase search for <code class="literal">quick
+      fox</code> with a slack of 0 will match <code class="literal">quick
+      fox</code> but not <code class="literal">quick brown fox</code>. With
+      a slack of 1 it will match the latter, but not <code class="literal">fox
+      quick</code>. A proximity search for <code class="literal">quick
+      fox</code> with the default slack will match the
+      latter, and also <code class="literal">a fox is a cunning and quick
+      animal</code>.</p></div><div class="sect3" title='3.1.8.2. Avanced search: the "filter" tab'><div class="titlepage"><div><div><h4 class="title"><a name="RCL.SEARCH.GUI.COMPLEX.FILTER"></a>3.1.8.2. Avanced search: the "filter" tab</h4></div></div></div><p>This part of the dialog has several sections which allow
+      filtering the results of a search according to a number of
+      criteria</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>The first section allows filtering by dates of last
+      modification. You can specify both a minimum and a maximum date. The
+      initial values are set according to the oldest and newest documents
+      found in the index.</p></li><li class="listitem"><p>The next section allows filtering the results by
+            file size. There are two entries for minimum and maximum
+            size. Enter decimal numbers. You can use suffix multipliers:
+            <code class="literal">k/K</code>, <code class="literal">m/M</code>,
+            <code class="literal">g/G</code>, <code class="literal">t/T</code> for 1E3, 1E6,
+            1E9, 1E12 respectively.</p></li><li class="listitem"><p>The next section allows filtering the results by their MIME
+            types, or MIME categories (ie: media/text/message/etc.).</p><p>You can transfer the types between two boxes, to define
+            which will be included or excluded by the search.</p><p>The state of the file type selection can be saved as
+            the default (the file type filter will not be activated at
+            program start-up, but the lists will be in the restored
+            state).</p></li><li class="listitem"><p>The bottom section allows restricting the search results to a
+            sub-tree of the indexed area. You can use the
+            <span class="guilabel">Invert</span> checkbox to search for files not in
+            the sub-tree instead. If you use directory filtering often and on
+            big subsets of the file system, you may think of setting up
+            multiple indexes instead, as the performance may be
+            better.</p><p>You can use relative/partial paths for filtering. Ie,
+          entering <code class="literal">dirA/dirB</code> would match either
+          <code class="filename">/dir1/dirA/dirB/myfile1</code> or
+          <code class="filename">/dir2/dirA/dirB/someother/myfile2</code>.</p></li></ul></div></div><div class="sect3" title="3.1.8.3. Avanced search history"><div class="titlepage"><div><div><h4 class="title"><a name="RCL.SEARCH.GUI.COMPLEX.HISTORY"></a>3.1.8.3. Avanced search history</h4></div></div></div><p>The advanced search tool memorizes the last 100 searches
+          performed. You can walk the saved searches by using the up and
+          down arrow keys while the keyboard focus belongs to the advanced
+          search dialog.</p><p>The complex search history can be erased, along with the
+          one for simple search, by selecting the <span class="guimenu">File</span> &#8594; <span class="guimenuitem">Erase Search History</span> menu entry.</p></div></div><div class="sect2" title="3.1.9. The term explorer tool"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.SEARCH.GUI.TERMEXPLORER"></a>3.1.9. The term explorer tool</h3></div></div></div><p><span class="application">Recoll</span> automatically manages the expansion of search terms
+      to their derivatives (ie: plural/singular, verb
+      inflections). But there are other cases where the exact search
+      term is not known. For example, you may not remember the exact
+      spelling, or only know the beginning of the name.</p><p>The search will only propose replacement terms with
+      spelling variations when no matching document were found. In some
+      cases, both proper spellings and mispellings are present in the
+      index, and it may be interesting to look for them explicitely.</p><p>The term explorer tool (started from the toolbar icon or
+      from the <span class="guilabel">Term explorer</span> entry of the
+      <span class="guilabel">Tools</span> menu) can be used to search the full index
+      terms list. It has three modes of operations:</p><div class="variablelist"><dl><dt><span class="term">Wildcard</span></dt><dd><p>In this mode of operation, you can enter a
+            search string with shell-like wildcards (*, ?, []). ie:
+            <em class="replaceable"><code>xapi*</code></em> would display all index terms
+            beginning with <em class="replaceable"><code>xapi</code></em>. (More
+            about wildcards <a class="link" href="RCL.SEARCH.ANCHORWILD.html#RCL.SEARCH.WILDCARDS" title="3.7.1. More about wildcards">here</a>).</p></dd><dt><span class="term">Regular expression</span></dt><dd><p>This mode will accept a regular expression
+            as input. Example:
+            <em class="replaceable"><code>word[0-9]+</code></em>. The expression is
+            implicitely anchored at the beginning. Ie:
+            <em class="replaceable"><code>press</code></em> will match
+            <em class="replaceable"><code>pression</code></em> but not
+            <em class="replaceable"><code>expression</code></em>. You can use
+            <em class="replaceable"><code>.*press</code></em> to match the latter,
+            but be aware that this will cause a full index term list
+            scan, which can be quite long.</p></dd><dt><span class="term">Stem expansion</span></dt><dd><p>This mode will perform the usual stem expansion
+          normally done as part user input processing. As such it is
+          probably mostly useful to demonstrate the process.
+          </p></dd><dt><span class="term">Spelling/Phonetic</span></dt><dd><p>In this
+            mode, you enter the term as you think it is spelled, and
+            <span class="application">Recoll</span> will do its best to find index terms that sound like
+            your entry. This mode uses the
+            <span class="application">Aspell</span> spelling application,
+            which must be installed on your system for things to work
+            (if your documents contain non-ascii characters, <span class="application">Recoll</span>
+            needs an aspell version newer than 0.60 for UTF-8
+            support). The language which is used to build the
+            dictionary out of the index terms (which is done at the
+            end of an indexing pass) is the one defined by your NLS
+            environment. Weird things will probably happen if
+            languages are mixed up.</p></dd></dl></div><p>Note that in cases where <span class="application">Recoll</span> does not know the beginning
+      of the string to search for (ie a wildcard expression like
+      <em class="replaceable"><code>*coll</code></em>), the expansion can take quite
+      a long time because the full index term list will have to be
+      processed. The expansion is currently limited at 10000 results for
+      wildcards and regular expressions. It is possible to change the
+      limit in the configuration file.</p><p>Double-clicking on a term in the result list will insert
+      it into the simple search entry field. You can also cut/paste
+      between the result list and any entry field (the end of lines
+      will be taken care of).</p></div><div class="sect2" title="3.1.10. Multiple indexes"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.SEARCH.GUI.MULTIDB"></a>3.1.10. Multiple indexes</h3></div></div></div><p>See the <a class="link" href="RCL.INDEXING.CONFIG.html#RCL.INDEXING.CONFIG.MULTIPLE" title="2.3.1. Multiple indexes">section
+	  describing the use of multiple indexes</a> for
+	generalities. Only the aspects concerning
+	the <span class="command"><strong>recoll</strong></span> GUI are described here.</p><p>A <span class="command"><strong>recoll</strong></span> program instance is always
+	associated with a specific index, which is the one to be updated
+	when requested from the <span class="guimenu">File</span> menu, but it can
+	use any number of <span class="application">Recoll</span> indexes for searching. The external
+	indexes can be selected through the <span class="guilabel">external
+	  indexes</span> tab in the preferences dialog.</p><p>Index selection is performed in two phases. A set of all
+	usable indexes must first be defined, and then the subset of
+	indexes to be used for searching. These parameters
+	are retained across program executions (there are kept
+	separately for each <span class="application">Recoll</span> configuration). The set of all indexes
+	is usually quite stable, while the active ones might typically
+	be adjusted quite frequently.</p><p>The main index (defined by
+	<code class="envar">RECOLL_CONFDIR</code>) is always active. If this is
+	undesirable, you can set up your base configuration to index
+	an empty directory.</p><p>When adding a new index to the set, you can select either
+        a <span class="application">Recoll</span> configuration directory, or directly a <span class="application">Xapian</span> index
+        directory. In the first case, the <span class="application">Xapian</span> index directory will
+        be obtained from the selected configuration.</p><p>As building the set of all indexes can be a little tedious
+	when done through the user interface, you can use the
+	<code class="envar">RECOLL_EXTRA_DBS</code> environment
+	variable to provide an initial set. This might typically be
+	set up by a system administrator so that every user does not
+	have to do it. The variable should define a colon-separated list
+	of index  directories, ie: 
+      </p><pre class="screen">export RECOLL_EXTRA_DBS=/some/place/xapiandb:/some/other/db</pre><p>Another environment variable, 
+        <code class="envar">RECOLL_ACTIVE_EXTRA_DBS</code> allows adding to the active
+        list of indexes. This variable was suggested and implemented by a
+        <span class="application">Recoll</span> user. It is mostly useful if you use scripts to mount
+        external volumes with <span class="application">Recoll</span> indexes. By using
+        <code class="envar">RECOLL_EXTRA_DBS</code> and
+        <code class="envar">RECOLL_ACTIVE_EXTRA_DBS</code>, you can add and activate
+        the index for the mounted volume when starting
+        <span class="command"><strong>recoll</strong></span>.
+      </p><p><code class="envar">RECOLL_ACTIVE_EXTRA_DBS</code> is available for
+        <span class="application">Recoll</span> versions 1.17.2 and later. A change was made in the same
+        update so that <span class="command"><strong>recoll</strong></span> will
+        automatically deactivate unreachable indexes when starting
+        up.</p></div><div class="sect2" title="3.1.11. Document history"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.SEARCH.GUI.HISTORY"></a>3.1.11. Document history</h3></div></div></div><p>Documents that you actually view (with the internal preview
+        or an external tool) are entered into the document history,
+        which is remembered.</p><p>You can display the history list by using
+        the <span class="guilabel">Tools/</span><span class="guilabel">Doc History</span> menu
+        entry.</p><p>You can erase the document history by using the
+      <span class="guilabel">Erase document history</span> entry in the
+      <span class="guimenu">File</span> menu.</p></div><div class="sect2" title="3.1.12. Sorting search results and collapsing duplicates"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.SEARCH.GUI.SORT"></a>3.1.12. Sorting search results and collapsing duplicates</h3></div></div></div><p>The documents in a result list are normally sorted in
+        order of relevance. It is possible to specify a different sort
+        order, either by using the vertical arrows in the GUI toolbox to
+        sort by date, or switching to the result table display and clicking
+        on any header. The sort order chosen inside the result table
+        remains active if you switch back to the result list, until you
+        click one of the vertical arrows, until both are unchecked (you are
+        back to sort by relevance).</p><p>Sort parameters are remembered between program
+        invocations, but result sorting is normally always inactive
+        when the program starts. It is possible to keep the sorting
+        activation state between program invocations by checking the
+        <span class="guilabel">Remember sort activation state</span> option in
+        the preferences.</p><p>It is also possible to hide duplicate entries inside
+        the result list (documents with the exact same contents as the
+        displayed one). The test of identity is based on an MD5 hash
+        of the document container, not only of the text contents (so
+        that ie, a text document with an image added will not be a
+        duplicate of the text only). Duplicates hiding is controlled
+        by an entry in the <span class="guilabel">GUI configuration</span>
+        dialog, and is off by default.</p><p>As of release 1.19, when a result document does have
+        undisplayed duplicates, a <code class="literal">Dups</code>
+        link will be shown with the result list entry. Clicking the
+        link will display the paths (URLs + ipaths) for the duplicate
+        entries.</p></div><div class="sect2" title="3.1.13. Search tips, shortcuts"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.SEARCH.GUI.TIPS"></a>3.1.13. Search tips, shortcuts</h3></div></div></div><div class="sect3" title="3.1.13.1. Terms and search expansion"><div class="titlepage"><div><div><h4 class="title"><a name="RCL.SEARCH.GUI.TIPS.TERMS"></a>3.1.13.1. Terms and search expansion</h4></div></div></div><p title="Term completion"><b>Term completion. </b>Typing <span class="keycap"><strong>Esc</strong></span> <span class="keycap"><strong>Space</strong></span> in
+        the simple search entry field while entering a word will
+        either complete the current word if its beginning matches a
+        unique term in the index, or open a window to propose a list
+        of completions.</p><p title="Picking up new terms from result or preview text"><b>Picking up new terms from result or preview 
+                   text. </b>Double-clicking on a word in the result list or in a
+        preview window will copy it to the simple search entry field.</p><p title="Wildcards"><b>Wildcards. </b>Wildcards can be used inside search terms in all forms
+            of searches. <a class="link" href="RCL.SEARCH.ANCHORWILD.html#RCL.SEARCH.WILDCARDS" title="3.7.1. More about wildcards">
+            More about wildcards</a>.
+          </p><p title="Automatic suffixes"><b>Automatic suffixes. </b>Words like <code class="literal">odt</code> or <code class="literal">ods</code>
+            can be automatically turned into query language
+            <code class="literal">ext:xxx</code> clauses. This can be enabled in the
+            <span class="guilabel">Search preferences</span> panel in the GUI.
+          </p><p title="Disabling stem expansion"><b>Disabling stem expansion. </b>Entering a capitalized word in any search field will prevent
+        stem expansion (no search for
+        <code class="literal">gardening</code> if you enter
+        <code class="literal">Garden</code> instead of
+        <code class="literal">garden</code>). This is the only case where
+        character case should make a difference for a <span class="application">Recoll</span>
+        search. You can also disable stem expansion or change the
+        stemming language in the preferences.</p><p title="Finding related documents"><b>Finding related documents. </b>Selecting the <span class="guilabel">Find similar documents</span> entry
+        in the result list paragraph right-click menu will select a
+        set of "interesting" terms from the current result, and insert
+        them into the simple search entry field. You can then possibly
+        edit the list and start a search to find documents which may
+        be apparented to the current result.</p><p title="File names"><b>File names. </b>File names are added as terms during indexing, and you can
+        specify them as ordinary terms in normal search fields (<span class="application">Recoll</span> used
+        to index all directories in the file path as terms. This has been
+        abandoned as it did not seem really useful). Alternatively, you
+        can use the specific file name search which will
+        <span class="emphasis"><em>only</em></span> look for file names, and may be
+        faster than the generic search especially when using wildcards.</p></div><div class="sect3" title="3.1.13.2. Working with phrases and proximity"><div class="titlepage"><div><div><h4 class="title"><a name="RCL.SEARCH.GUI.TIPS.PHRASES"></a>3.1.13.2. Working with phrases and proximity</h4></div></div></div><p title="Phrases and Proximity searches"><b>Phrases and Proximity searches. </b>A phrase can be looked for by enclosing it in double
+        quotes. Example: <code class="literal">"user manual"</code> will look
+        only for occurrences of <code class="literal">user</code> immediately
+        followed by <code class="literal">manual</code>. You can use the
+        <span class="guilabel">This phrase</span> field of the advanced
+        search dialog to the same effect. Phrases can be entered along
+        simple terms in all simple or advanced search entry fields
+        (except <span class="guilabel">This exact phrase</span>).</p><p title="AutoPhrases"><b>AutoPhrases. </b>This option can be set in the preferences dialog. If it is
+        set, a phrase will be automatically built and added to simple
+        searches when looking for <code class="literal">Any terms</code>. This
+        will not change radically the results, but will give a relevance
+        boost to the results where the search terms appear as a
+        phrase. Ie: searching for <code class="literal">virtual reality</code>
+        will still find all documents where either
+        <code class="literal">virtual</code> or <code class="literal">reality</code> or 
+        both appear, but those which contain <code class="literal">virtual
+          reality</code> should appear sooner in the list.</p><p>Phrase searches can strongly slow down a query if most of the
+        terms in the phrase are common. This is why the
+        <code class="varname">autophrase</code> option is off by default for <span class="application">Recoll</span>
+        versions before 1.17. As of version 1.17,
+        <code class="varname">autophrase</code> is on by default, but very common
+        terms will be removed from the constructed phrase. The removal
+        threshold can be adjusted from the search preferences.</p><p title="Phrases and abbreviations"><b>Phrases and abbreviations. </b>As of
+      <span class="application">Recoll</span> version 1.17, dotted abbreviations like
+      <code class="literal">I.B.M.</code> are also automatically indexed as a word
+      without the dots: <code class="literal">IBM</code>. Searching for the word
+      inside a phrase (ie: <code class="literal">"the IBM company"</code>) will only
+      match the dotted abrreviation if you increase the phrase slack (using the
+      advanced search panel control, or the <code class="literal">o</code> query
+      language modifier). Literal occurences of the word will be matched
+      normally.</p></div><div class="sect3" title="3.1.13.3. Others"><div class="titlepage"><div><div><h4 class="title"><a name="RCL.SEARCH.GUI.TIPS.MISC"></a>3.1.13.3. Others</h4></div></div></div><p title="Using fields"><b>Using fields. </b>You can use the <a class="link" href="RCL.SEARCH.LANG.html" title="3.5. The query language">query
+        language </a> and field specifications
+        to only search certain parts of documents. This can be
+        especially helpful with email, for example only searching
+        emails from a specific originator:
+        <code class="literal">search tips from:helpfulgui</code>
+        </p><p title="Ajusting the result table columns"><b>Ajusting the result table columns. </b>When displaying results in table mode, you can use a
+        right click on the table headers to activate a pop-up menu
+        which will let you adjust what columns are displayed. You can
+        drag the column headers to adjust their order. You can click
+        them to sort by the field displayed in the column.  You can
+        also save the result list in CSV format.</p><p title="Changing the GUI geometry"><b>Changing the GUI geometry. </b>It is possible to configure the GUI in wide form
+      factor by dragging the toolbars to one of the sides (their
+      location is remembered between sessions), and moving the
+      category filters to a menu (can be set in the 
+	  <span class="guimenu">Preferences</span> &#8594; <span class="guimenuitem">GUI configuration</span> &#8594; <span class="guimenuitem">User interface</span> panel).</p><p title="Query explanation"><b>Query explanation. </b>You can get an exact description of what the query
+        looked for, including stem expansion, and Boolean operators
+        used, by clicking on the result list header.</p><p title="Advanced search history"><b>Advanced search history. </b>As of <span class="application">Recoll</span> 1.18, you can display any of the last 100 complex
+          searches performed by using the up and down arrow keys while the
+          advanced search panel is active.</p><p title="Browsing the result list inside a preview window"><b>Browsing the result list inside a preview 
+                   window. </b>Entering <span class="keycap"><strong>Shift-Down</strong></span> or <span class="keycap"><strong>Shift-Up</strong></span>
+       (<span class="keycap"><strong>Shift</strong></span> + an arrow key) in a preview window will
+       display the next or the previous document from the result
+       list. Any secondary search currently active will be executed on
+       the new document.</p><p title="Scrolling the result list from the keyboard"><b>Scrolling the result list from the keyboard. </b>You can use <span class="keycap"><strong>PageUp</strong></span> and <span class="keycap"><strong>PageDown</strong></span>
+	 to scroll the result list, <span class="keycap"><strong>Shift+Home</strong></span> to go back
+	 to the first page. These work even while the focus is in the
+	 search entry.</p><p title="Result table: moving the focus to the table"><b>Result table: moving the focus to the table. </b>You can use <span class="keycap"><strong>Ctrl-r</strong></span> to move the focus
+      from the search entry to the table, and then use the arrow keys
+      to change the current row. <span class="keycap"><strong>Ctrl-Shift-s</strong></span> returns to 
+      the search.</p><p title="Result table: open / preview"><b>Result table: open / preview. </b>With the focus in the result table, you can use
+      <span class="keycap"><strong>Ctrl-o</strong></span> to open the document from the current
+      row, <span class="keycap"><strong>Ctrl-Shift-o</strong></span> to open the document and close
+      <span class="command"><strong>recoll</strong></span>, <span class="keycap"><strong>Ctrl-d</strong></span> to preview
+      the document.</p><p title="Editing a new search while the focus is not in the search entry"><b>Editing a new search while the focus is not
+          in the search entry. </b>You can use the <span class="keycap"><strong>Ctrl-Shift-S</strong></span> shortcut to
+         return the cursor to the search entry (and select the current
+         search text), while the focus is anywhere in the main
+         window.</p><p title="Forced opening of a preview window"><b>Forced opening of a preview window. </b>You can use <span class="keycap"><strong>Shift</strong></span>+Click on a result list
+       <code class="literal">Preview</code> link to force the creation of a
+       preview window instead of a new tab in the existing one.</p><p title="Closing previews"><b>Closing previews. </b>Entering <span class="keycap"><strong>Ctrl-W</strong></span> in a tab will
+        close it (and, for the last tab, close the preview
+        window). Entering <span class="keycap"><strong>Esc</strong></span> will close the preview
+        window and all its tabs.</p><p title="Printing previews"><b>Printing previews. </b>Entering <span class="keycap"><strong>Ctrl-P</strong></span> in a preview window will print 
+        the currently displayed text.</p><p title="Quitting"><b>Quitting. </b>Entering <span class="keycap"><strong>Ctrl-Q</strong></span> almost anywhere will
+        close the application.</p></div></div><div class="sect2" title="3.1.14. Customizing the search interface"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.SEARCH.GUI.CUSTOM"></a>3.1.14. Customizing the search interface</h3></div></div></div><p>You can customize some aspects of the search interface by using
+      the <span class="guimenu">GUI configuration</span> entry in the
+      <span class="guimenu">Preferences</span> menu.</p><p>There are several tabs in the dialog, dealing with the
+      interface itself, the parameters used for searching and
+      returning results, and what indexes are searched.</p><p title="User interface parameters:"><a name="RCL.SEARCH.GUI.CUSTOM.UI"></a><b>User interface parameters: </b>
+      </p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p><span class="guilabel">Highlight color for query
+            terms</span>: Terms from the user query are highlighted in
+            the result list samples and the preview window. The color can
+            be chosen here. Any Qt color string should work (ie
+            <code class="literal">red</code>, <code class="literal">#ff0000</code>). The
+            default is <code class="literal">blue</code>.</p></li><li class="listitem"><p><span class="guilabel">Style sheet</span>:
+                The name of a <span class="application">Qt</span> style sheet
+                text file which is applied to the whole Recoll application
+                on startup. The default value is empty, but there is a
+                skeleton style sheet (<code class="filename">recoll.qss</code>)
+                inside the <code class="filename">/usr/share/recoll/examples</code>
+                directory. Using a style sheet, you can change most
+                <span class="command"><strong>recoll</strong></span> graphical parameters:
+                colors, fonts, etc. See the sample file for a few
+                simple examples.</p><p>You should be aware that parameters (e.g.: the
+                background color) set inside the <span class="application">Recoll</span> GUI style sheet
+                will override global system preferences, with possible
+                strange side effects: for example if you set the
+                foreground to a light color and the background to a
+                dark one in the desktop preferences, but only the
+                background is set inside the <span class="application">Recoll</span> style sheet, and it
+                is light too, then text will appear light-on-light
+                inside the <span class="application">Recoll</span> GUI.</p></li><li class="listitem"><p><span class="guilabel">Maximum text size highlighted for
+            preview</span> Inserting highlights on search term inside
+            the text before inserting it in the preview window involves
+            quite a lot of processing, and can be disabled over the given
+            text size to speed up loading.</p></li><li class="listitem"><p><span class="guilabel">Prefer HTML to plain text for
+	    preview</span> if set, Recoll will display HTML as such
+	    inside the preview window. If this causes problems with the Qt
+	    HTML display, you can uncheck it to display the plain text
+	    version instead. </p></li><li class="listitem"><p><span class="guilabel">Plain text to HTML line style</span>:
+                when displaying plain text inside the preview window, <span class="application">Recoll</span>
+                tries to preserve some of the original text line breaks and
+                indentation. It can either use PRE HTML tags, which will
+                well preserve the indentation but will force horizontal
+                scrolling for long lines, or use BR tags to break at the
+                original line breaks, which will let the editor introduce
+                other line breaks according to the window width, but will
+                lose some of the original indentation. The third option has
+                been available in recent releases and is probably now the best
+                one: use PRE tags with line wrapping.</p></li><li class="listitem"><p><span class="guilabel">Use desktop preferences to choose
+            document editor</span>: if this is checked, the
+            <span class="command"><strong>xdg-open</strong></span> utility will be used to open files
+            when you click the <span class="guilabel">Open</span> link in the result
+            list, instead of the application defined in
+            <code class="filename">mimeview</code>. <span class="command"><strong>xdg-open</strong></span> will
+            in term use your desktop preferences to choose an appropriate
+            application.</p></li><li class="listitem"><p><span class="guilabel">Exceptions</span>: when using the
+            desktop preferences for opening documents, these are MIME types
+            that will still be opened according to <span class="application">Recoll</span> preferences. This
+            is useful for passing parameters like page numbers or search
+            strings to applications that support them
+            (e.g. <span class="application">evince</span>). This cannot be done
+            with <span class="command"><strong>xdg-open</strong></span> which only supports passing
+            one parameter.</p></li><li class="listitem"><p><span class="guilabel">Choose editor applications</span>
+            this will let you choose the command started by the
+            <span class="guilabel">Open</span> links inside the result list, for
+            specific document types.</p></li><li class="listitem"><p><span class="guilabel">Display category filter as
+	    toolbar...</span> this will let you choose if the document
+	    categories are displayed as a list or a set of buttons.</p></li><li class="listitem"><p><span class="guilabel">Auto-start simple search on white
+            space entry</span>: if this is checked, a search will be
+            executed each time you enter a space in the simple search input
+            field. This lets you look at the result list as you enter new
+            terms. This is off by default, you may like it or not...</p></li><li class="listitem"><p><span class="guilabel">Start with advanced search dialog open
+            </span>: If you use this dialog frequently, checking
+            the entries will get it to open when recoll starts.</p></li><li class="listitem"><p><span class="guilabel">Remember sort activation
+	    state</span> if set, Recoll will remember the sort tool
+	    stat between invocations. It normally starts with sorting
+	    disabled.</p></li></ul></div><p title="User interface parameters:">
+      </p><p title="Result list parameters:"><a name="RCL.SEARCH.GUI.CUSTOM.RL"></a><b>Result list parameters: </b>
+          </p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p><span class="guilabel">Number of results in a result
+                  page</span></p></li><li class="listitem"><p><span class="guilabel">Result list font</span>: There is
+            quite a lot of information shown in the result list, and you
+            may want to customize the font and/or font size. The rest of
+            the fonts used by <span class="application">Recoll</span> are determined by your generic Qt
+            config (try the <span class="command"><strong>qtconfig</strong></span> command).</p></li><li class="listitem"><p><a name="RCL.SEARCH.GUI.CUSTOM.RESULTPARA"></a><span class="guilabel">Edit result list paragraph format string</span>:
+            allows you to change the presentation of each result list
+            entry. See the <a class="link" href="RCL.SEARCH.html#RCL.SEARCH.GUI.CUSTOM.RESLIST" title="3.1.14.1. The result list format">
+                result list customisation section</a>.</p></li><li class="listitem"><p><a name="RCL.SEARCH.GUI.CUSTOM.RESULTHEAD"></a><span class="guilabel">Edit result page HTML header insert</span>:
+            allows you to define text inserted at the end of the result
+            page HTML header.  
+            More detail in the <a class="link" href="RCL.SEARCH.html#RCL.SEARCH.GUI.CUSTOM.RESLIST" title="3.1.14.1. The result list format"> 
+                result list customisation section.</a></p></li><li class="listitem"><p><span class="guilabel">Date format</span>: allows specifying the
+            format used for displaying dates inside the result list. This
+            should be specified as an strftime() string (man strftime).</p></li><li class="listitem"><p><a name="RCL.SEARCH.GUI.CUSTOM.ABSSEP"></a><span class="guilabel">Abstract snippet separator</span>:
+            for synthetic abstracts built from index data, which are
+            usually made of several snippets from different parts of the
+            document, this defines the snippet separator, an ellipsis by
+            default. </p></li></ul></div><p title="Search parameters:"><a name="RCL.SEARCH.GUI.CUSTOM.SEARCH"></a><b>Search parameters: </b>
+      </p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p><span class="guilabel">Hide duplicate results</span>:
+            decides if result list entries are shown for identical
+            documents found in different places.</p></li><li class="listitem"><p><span class="guilabel">Stemming language</span>:
+            stemming obviously depends on the document's language. This
+            listbox will let you chose among the stemming databases which
+            were built during indexing (this is set in the <a class="link" href="RCL.INSTALL.CONFIG.html#RCL.INSTALL.CONFIG.RECOLLCONF" title="5.4.1. The main configuration file, recoll.conf">main configuration
+            file</a>), or later added with <span class="command"><strong>recollindex
+            -s</strong></span> (See the recollindex manual). Stemming languages
+            which are dynamically added will be deleted at the next
+            indexing pass unless they are also added in the configuration
+            file.</p></li><li class="listitem"><p><span class="guilabel">Automatically add phrase to simple
+            searches</span>: a phrase will be automatically built and
+            added to simple searches when looking for <code class="literal">Any
+            terms</code>. This will give a relevance boost to the
+            results where the search terms appear as a phrase (consecutive
+            and in order).</p></li><li class="listitem"><p><span class="guilabel">Autophrase term frequency threshold
+            percentage</span>: very frequent terms should not be included
+            in automatic phrase searches for performance reasons. The
+            parameter defines the cutoff percentage (percentage of the
+            documents where the term appears).</p></li><li class="listitem"><p><span class="guilabel">Replace abstracts from
+            documents</span>: this decides if we should synthesize and
+            display an abstract in place of an explicit abstract found
+            within the document itself.</p></li><li class="listitem"><p><span class="guilabel">Dynamically build
+            abstracts</span>: this decides if <span class="application">Recoll</span> tries to build
+            document abstracts (lists of <span class="emphasis"><em>snippets</em></span>)
+            when displaying the result list. Abstracts are constructed by
+            taking context from the document information, around the search
+            terms.</p></li><li class="listitem"><p><span class="guilabel">Synthetic abstract size</span>:
+            adjust to taste...</p></li><li class="listitem"><p><span class="guilabel">Synthetic abstract context
+            words</span>: how many words should be displayed around
+            each term occurrence.</p></li><li class="listitem"><p><span class="guilabel">Query language magic file name 
+              suffixes</span>: a list of words which automatically get
+              turned into <code class="literal">ext:xxx</code> file name suffix clauses
+              when starting a query language query (ie: <code class="literal">doc xls
+              xlsx...</code>). This will save some typing for people who
+              use file types a lot when querying.</p></li></ul></div><p title="Search parameters:">
+       </p><p title="External indexes:"><a name="RCL.SEARCH.GUI.CUSTOM.EXTRADB"></a><b>External indexes: </b>This panel will let you browse for additional indexes
+      that you may want to search. External indexes are designated by
+      their database directory (ie:
+      <code class="filename">/home/someothergui/.recoll/xapiandb</code>,
+      <code class="filename">/usr/local/recollglobal/xapiandb</code>).</p><p>Once entered, the indexes will appear in the
+        <span class="guilabel">External indexes</span> list, and you can
+        chose which ones you want to use at any moment by checking or
+        unchecking their entries.</p><p>Your main database (the one the current configuration
+      indexes to), is always implicitly active. If this is not
+      desirable, you can set up your configuration so that it indexes,
+      for example, an empty directory. An alternative indexer may also
+      need to implement a way of purging the index from stale data,
+      </p><div class="sect3" title="3.1.14.1. The result list format"><div class="titlepage"><div><div><h4 class="title"><a name="RCL.SEARCH.GUI.CUSTOM.RESLIST"></a>3.1.14.1. The result list format</h4></div></div></div><p>The result list presentation can be exhaustively customized
+          by adjusting two elements:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>The paragraph format</p></li><li class="listitem"><p>HTML code inside the header
+              section</p></li></ul></div><p>These can be edited from the <span class="guilabel">Result list</span>
+          tab of the <span class="guilabel">GUI configuration</span>.</p><p>Newer versions of Recoll (from 1.17) use a WebKit HTML
+          object by default (this may be disabled at build time), and
+          total customisation is possible with full support for CSS and
+          Javascript. Conversely, there are limits to what you can do with
+          the older Qt QTextBrowser, but still, it is possible to decide
+          what data each result will contain, and how it will be
+          displayed.</p><p>No more detail will be given about the header part (only
+          useful with the WebKit build), if there are restrictions to
+          what you can do, they are beyond this author's HTML/CSS/Javascript
+          abilities... There are a few examples on the 
+          <a class="ulink" href="http://www.recoll.org/custom.html" target="_top">page about 
+            customising the result list</a> on the <span class="application">Recoll</span> web site.</p><div class="sect4" title="The paragraph format"><div class="titlepage"><div><div><h5 class="title"><a name="RCL.SEARCH.GUI.CUSTOM.RESLIST.PARA"></a>The paragraph format</h5></div></div></div><p>This is an arbitrary HTML string where the following printf-like
+          <code class="literal">%</code> substitutions will be performed:
+
+        </p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p title="%A"><b>%A. </b>Abstract</p></li><li class="listitem"><p title="%D"><b>%D. </b>Date</p></li><li class="listitem"><p title="%I"><b>%I. </b>Icon image
+            name. This is normally determined from the MIME type. The
+            associations are defined inside the 
+            <a class="link" href="RCL.INSTALL.CONFIG.html#RCL.INSTALL.CONFIG.MIMECONF" title="5.4.4. The mimeconf file">
+              <code class="filename">mimeconf</code> configuration file</a>. 
+            If a thumbnail for the file is found at
+            the standard Freedesktop location, this will be displayed
+            instead.</p></li><li class="listitem"><p title="%K"><b>%K. </b>Keywords (if
+          any)</p></li><li class="listitem"><p title="%L"><b>%L. </b>Precooked Preview,
+            Edit, and possibly Snippets links</p></li><li class="listitem"><p title="%M"><b>%M. </b>MIME
+                  type</p></li><li class="listitem"><p title="%N"><b>%N. </b>result Number inside
+            the result page</p></li><li class="listitem"><p title="%P"><b>%P. </b>Parent folder
+          Url. In the case of an embedded document, this is the parent folder
+          for the top level container file.</p></li><li class="listitem"><p title="%R"><b>%R. </b>Relevance
+            percentage</p></li><li class="listitem"><p title="%S"><b>%S. </b>Size
+          information</p></li><li class="listitem"><p title="%T"><b>%T. </b>Title or Filename if
+          not set.</p></li><li class="listitem"><p title="%t"><b>%t. </b>Title or Filename if
+          not set.</p></li><li class="listitem"><p title="%U"><b>%U. </b>Url</p></li></ul></div><p>
+
+        The format of the Preview, Edit, and Snippets links is 
+        <code class="literal">&lt;a href="P%N"&gt;</code>,
+        <code class="literal">&lt;a href="E%N"&gt;</code>
+        and 
+        <code class="literal">&lt;a href="A%N"&gt;</code>
+        where <em class="replaceable"><code>docnum</code></em> (%N) expands to the document
+        number inside the result page).</p><p>A link target defined as <code class="literal">"F%N"</code> will open
+        the document corresponding to the <code class="literal">%P</code> parent
+        folder expansion, usually creating a file manager window on the
+        folder where the container file resides. E.g.:
+        </p><pre class="programlisting">&lt;a href="F%N"&gt;%P&lt;/a&gt;</pre><p>
+        </p><p>A link target defined as
+        <code class="literal">R%N|<em class="replaceable"><code>scriptname</code></em></code> will
+        run the corresponding script on the result file (if the document is
+        embedded, the script will be started on the top-level parent).
+        See the <a class="link" href="RCL.SEARCH.html#RCL.SEARCH.GUI.RUNSCRIPT" title="3.1.4. Running arbitrary commands on result files (1.20 and later)">section about
+        defining scripts</a>.</p><p>In addition to the predefined values above, all strings
+        like <code class="literal">%(fieldname)</code> will be replaced by the
+        value of the field named <code class="literal">fieldname</code> for this
+        document. Only stored fields can be accessed in this way, the
+        value of indexed but not stored fields is not known at this
+        point in the search process
+        (see <a class="link" href="RCL.PROGRAM.FIELDS.html" title="4.2. Field data processing">field
+        configuration</a>). There are currently very few fields
+        stored by default, apart from the values above
+        (only <code class="literal">author</code>
+        and <code class="literal">filename</code>), so this feature will need
+        some custom local configuration to be useful. An example
+        candidate would be the <code class="literal">recipient</code> field
+        which is generated by the message input handlers.</p><p>The default value for the paragraph format string is:
+        </p><pre class="screen">
+&lt;img src="%I" align="left"&gt;%R %S %L &amp;nbsp;&amp;nbsp;&lt;b&gt;%T&lt;/b&gt;&lt;br&gt;
+%M&amp;nbsp;%D&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;i&gt;%U&lt;/i&gt;&amp;nbsp;%i&lt;br&gt;
+%A %K
+</pre><p>
+
+        You may, for example, try the following for a more web-like
+        experience:
+
+        </p><pre class="screen">
+&lt;u&gt;&lt;b&gt;&lt;a href="P%N"&gt;%T&lt;/a&gt;&lt;/b&gt;&lt;/u&gt;&lt;br&gt;
+%A&lt;font color=#008000&gt;%U - %S&lt;/font&gt; - %L
+</pre><p>
+
+       Note that the P%N link in the above paragraph makes the title a
+       preview link. Or the clean looking:
+
+        </p><pre class="screen">
+&lt;img src="%I" align="left"&gt;%L &lt;font color="#900000"&gt;%R&lt;/font&gt;
+&amp;nbsp;&amp;nbsp;&lt;b&gt;%T&amp;&lt;/b&gt;&lt;br&gt;%S&amp;nbsp;
+&lt;font color="#808080"&gt;&lt;i&gt;%U&lt;/i&gt;&lt;/font&gt;
+&lt;table bgcolor="#e0e0e0"&gt;
+&lt;tr&gt;&lt;td&gt;&lt;div&gt;%A&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;%K
+</pre><p>
+        </p><p>These samples, and some others are 
+          <a class="ulink" href="http://www.recoll.org/custom.html" target="_top">on the web
+            site, with pictures to show how they look.</a></p><p>It is also possible to 
+          <a class="link" href="RCL.SEARCH.html#RCL.SEARCH.GUI.CUSTOM.ABSSEP">
+             define the value of the snippet separator inside the abstract
+             section</a>.</p></div></div></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="RCL.INDEXING.MONITOR.html">Prev</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="RCL.SEARCH.KIO.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">2.8. Real time indexing </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 3.2. Searching with the KDE KIO slave</td></tr></table></div></body></html>

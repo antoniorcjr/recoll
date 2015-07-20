@@ -1,0 +1,5 @@
+include $(depth)/mk/commondefs
+include $(depth)/mk/localdefs
+
+ALL_CXXFLAGS = $(CXXFLAGS) $(COMMONCXXFLAGS) $(LOCALCXXFLAGS) -pthread 
+LIBSYS = -pthread -lz

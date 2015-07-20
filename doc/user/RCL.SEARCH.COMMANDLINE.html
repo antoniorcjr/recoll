@@ -1,0 +1,57 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>3.3. Searching on the command line</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="Recoll user manual"><link rel="up" href="RCL.SEARCH.html" title="Chapter 3. Searching"><link rel="prev" href="RCL.SEARCH.KIO.html" title="3.2. Searching with the KDE KIO slave"><link rel="next" href="RCL.SEARCH.PTRANS.html" title="3.4. Path translations"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">3.3. Searching on the command line</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="RCL.SEARCH.KIO.html">Prev</a> </td><th width="60%" align="center">Chapter 3. Searching</th><td width="20%" align="right"> <a accesskey="n" href="RCL.SEARCH.PTRANS.html">Next</a></td></tr></table><hr></div><div class="sect1" title="3.3. Searching on the command line"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="RCL.SEARCH.COMMANDLINE"></a>3.3. Searching on the command line</h2></div></div></div><p>There are several ways to obtain search results as a text
+    stream, without a graphical interface:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>By passing option <code class="option">-t</code> to the
+      <span class="command"><strong>recoll</strong></span> program.</p></li><li class="listitem"><p>By using the <span class="command"><strong>recollq</strong></span> program.</p></li><li class="listitem"><p>By writing a custom
+      <span class="application">Python</span> program, using the 
+      <a class="link" href="RCL.PROGRAM.API.html#RCL.PROGRAM.API.PYTHON" title="4.3.2. Python interface">Recoll Python API</a>.</p></li></ul></div><p>The first two methods work in the same way and accept/need the same
+    arguments (except for the additional <code class="option">-t</code> to
+    <span class="command"><strong>recoll</strong></span>). The query to be executed is specified
+    as command line arguments.</p><p><span class="command"><strong>recollq</strong></span> is not built by default. You can
+    use the <code class="filename">Makefile</code> in the
+    <code class="filename">query</code> directory to build it. This is a very
+    simple program, and if you can program a little c++, you may find it
+    useful to taylor its output format to your needs.</p><p><span class="command"><strong>recollq</strong></span> has a man page (not installed by
+    default, look in the <code class="filename">doc/man</code> directory). The
+    Usage string is as follows:</p><pre class="programlisting">
+recollq: usage:
+ -P: Show the date span for all the documents present in the index
+ [-o|-a|-f] [-q] &lt;query string&gt;
+ Runs a recoll query and displays result lines. 
+  Default: will interpret the argument(s) as a xesam query string
+    query may be like: 
+    implicit AND, Exclusion, field spec:    t1 -t2 title:t3
+    OR has priority: t1 OR t2 t3 OR t4 means (t1 OR t2) AND (t3 OR t4)
+    Phrase: "t1 t2" (needs additional quoting on cmd line)
+  -o Emulate the GUI simple search in ANY TERM mode
+  -a Emulate the GUI simple search in ALL TERMS mode
+  -f Emulate the GUI simple search in filename mode
+  -q is just ignored (compatibility with the recoll GUI command line)
+Common options:
+    -c &lt;configdir&gt; : specify config directory, overriding $RECOLL_CONFDIR
+    -d also dump file contents
+    -n [first-]&lt;cnt&gt; define the result slice. The default value for [first]
+       is 0. Without the option, the default max count is 2000.
+       Use n=0 for no limit
+    -b : basic. Just output urls, no mime types or titles
+    -Q : no result lines, just the processed query and result count
+    -m : dump the whole document meta[] array for each result
+    -A : output the document abstracts
+    -S fld : sort by field &lt;fld&gt;
+    -s stemlang : set stemming language to use (must exist in index...)
+       Use -s "" to turn off stem expansion
+    -D : sort descending
+    -i &lt;dbdir&gt; : additional index, several can be given
+    -e use url encoding (%xx) for urls
+    -F &lt;field name list&gt; : output exactly these fields for each result.
+       The field values are encoded in base64, output in one line and 
+       separated by one space character. This is the recommended format 
+       for use by other programs. Use a normal query with option -m to 
+       see the field names.
+</pre><p>Sample execution:</p><pre class="programlisting">recollq 'ilur -nautique mime:text/html'
+Recoll query: ((((ilur:(wqf=11) OR ilurs) AND_NOT (nautique:(wqf=11)
+  OR nautiques OR nautiqu OR nautiquement)) FILTER Ttext/html))
+4 results
+text/html       [file:///Users/uncrypted-dockes/projets/bateaux/ilur/comptes.html]      [comptes.html]  18593   bytes   
+text/html       [file:///Users/uncrypted-dockes/projets/nautique/webnautique/articles/ilur1/index.html] [Constructio...
+text/html       [file:///Users/uncrypted-dockes/projets/pagepers/index.html]    [psxtcl/writemime/recoll]...
+text/html       [file:///Users/uncrypted-dockes/projets/bateaux/ilur/factEtCie/recu-chasse-maree....
+</pre></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="RCL.SEARCH.KIO.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="RCL.SEARCH.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="RCL.SEARCH.PTRANS.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">3.2. Searching with the KDE KIO slave </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 3.4. Path translations</td></tr></table></div></body></html>

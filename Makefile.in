@@ -1,0 +1,90 @@
+# Copyright (C) 2005 J.F.Dockes
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+bindir = @bindir@
+libdir = @libdir@
+datadir = @datadir@
+datarootdir = @datarootdir@
+mandir = @mandir@
+
+QMAKE = @QMAKE@
+QTGUI = @QTGUI@
+
+RCLLIBVERSION=@RCLLIBVERSION@
+
+all: configure mk/sysconf 
+	(cd lib; sh mkMake)
+	${MAKE} -C lib
+	${MAKE} -C index depend recollindex
+	@NOQTMAKE@(cd $(QTGUI); ${QMAKE} recoll.pro)
+	@NOQTMAKE@${MAKE} -C $(QTGUI) depth=.. prefix=$(prefix) exec_prefix=$(exec_prefix) libdir=$(libdir)
+	@NOPYTHON@${MAKE} -C python/recoll libdir=$(libdir)
+	${MAKE} -C query recollq xadump
+
+mk/sysconf:
+	@echo "You need to run configure first" ; exit 1
+
+static: mk/sysconf
+	${MAKE} -C lib
+	rm -f index/recollindex
+	${MAKE} -C index BSTATIC=-Wl,-Bstatic BDYNAMIC=-Wl,-Bdynamic \
+            LIBXAPIANSTATICEXTRA="@LIBXAPIANSTATICEXTRA@" \
+	       recollindex 
+	@NOQTMAKE@(cd $(QTGUI); $(QMAKE) recoll.pro)
+	@NOQTMAKE@rm -f $(QTGUI)/recoll
+	@NOQTMAKE@${MAKE} -C $(QTGUI) BSTATIC=-Wl,-Bstatic \
+	@NOQTMAKE@   BDYNAMIC=-Wl,-Bdynamic depth=.. \
+	@NOQTMAKE@   LIBXAPIANSTATICEXTRA="@LIBXAPIANSTATICEXTRA@"
+
+clean:
+	${MAKE} -C common clean
+	${MAKE} -C index clean
+	${MAKE} -C internfile clean
+	${MAKE} -C query clean
+	${MAKE} -C utils clean
+	-${MAKE} -C lib clean
+	-${MAKE} -C python/recoll clean
+	@NOQTMAKE@@-${MAKE} -C $(QTGUI) clean
+	rm -f qtgui/Makefile qtgui/confgui/Makefile qtgui/recoll
+	rm -f filters/rclexecm.pyc
+	rm -rf qtgui/.moc qtgui/.ui qtgui/confgui/.moc qtgui/confgui/.ui
+	rm -rf qtgui/.obj qtgui/.moc qtgui/.ui 
+	rm -rf python/recoll/build
+	rm -rf php/recoll/build php/recoll/include php/recoll/modules
+	rm -rf $(QTGUI)/recoll.app
+
+# Note: we don't remove the top Makefile, to keep the "clean" targets
+# available but a "Make" won't work without a configure anyway
+distclean: clean
+	-${MAKE} -C python/recoll distclean
+	rm -f mk/sysconf mk/localdefs sampleconf/recoll.conf \
+	   qtgui/recoll.pro \
+	   config.log config.status \
+	   recollinstall \
+	   lib/*.dep lib/mkMake lib/Makefile common/autoconfig.h
+	rm -f common/rclversion.h
+	rm -f index/alldeps lib/alldeps query/alldeps \
+            bincimapmime/alldeps common/alldeps internfile/alldeps utils/alldeps
+	rm -rf autom4te.cache
+
+maintainer-clean: distclean
+	rm -f doc/user/*.html* doc/user/*.txt doc/user/HTML.manifest
+	rm -f qtgui/i18n/*.qm
+
+# recollinstall can be executed by the user and will compute 'normal'
+# values for bindir etc., relative to the prefix argument.  When executed
+# here, we pass a bunch of variables in the environment, the values will
+# override the computed defaults.
+install: all
+	DESTDIR=${DESTDIR} bindir=${bindir} datadir=${datadir} \
+          libdir=${libdir} mandir=${mandir} \
+	  /bin/sh ./recollinstall ${prefix}
+
+configure: VERSION configure.ac
+	rm -f configure
+	autoconf
+	@echo run configure and make again
+	exit 1
+.PHONY: all static clean distclean install

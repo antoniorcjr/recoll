@@ -1,0 +1,195 @@
+#!/bin/sh
+
+mk=Makefile
+depth=${depth:-..}
+sys=`uname`
+
+SRC_CPP="\
+${depth}/aspell/rclaspell.cpp \
+${depth}/common/beaglequeuecache.cpp \
+${depth}/common/cstr.cpp \
+${depth}/common/rclconfig.cpp \
+${depth}/common/rclinit.cpp \
+${depth}/common/textsplit.cpp \
+${depth}/common/unacpp.cpp \
+${depth}/index/beaglequeue.cpp \
+${depth}/index/bglfetcher.cpp \
+${depth}/index/fetcher.cpp \
+${depth}/index/fsfetcher.cpp \
+${depth}/index/fsindexer.cpp \
+${depth}/index/indexer.cpp \
+${depth}/index/mimetype.cpp \
+${depth}/index/subtreelist.cpp \
+${depth}/internfile/htmlparse.cpp \
+${depth}/internfile/internfile.cpp \
+${depth}/internfile/mh_exec.cpp \
+${depth}/internfile/mh_execm.cpp \
+${depth}/internfile/mh_html.cpp \
+${depth}/internfile/mh_mail.cpp \
+${depth}/internfile/mh_mbox.cpp \
+${depth}/internfile/mh_text.cpp \
+${depth}/internfile/mimehandler.cpp \
+${depth}/internfile/myhtmlparse.cpp \
+${depth}/internfile/extrameta.cpp \
+${depth}/internfile/txtdcode.cpp \
+${depth}/internfile/uncomp.cpp \
+${depth}/query/docseq.cpp \
+${depth}/query/docseqdb.cpp \
+${depth}/query/docseqhist.cpp \
+${depth}/query/filtseq.cpp \
+${depth}/query/dynconf.cpp \
+${depth}/query/plaintorich.cpp \
+${depth}/query/recollq.cpp \
+${depth}/query/reslistpager.cpp \
+${depth}/query/sortseq.cpp \
+${depth}/query/wasastringtoquery.cpp \
+${depth}/query/wasatorcl.cpp \
+${depth}/rcldb/daterange.cpp \
+${depth}/rcldb/expansiondbs.cpp \
+${depth}/rcldb/rclabstract.cpp \
+${depth}/rcldb/rcldb.cpp \
+${depth}/rcldb/rcldoc.cpp \
+${depth}/rcldb/rcldups.cpp \
+${depth}/rcldb/rclquery.cpp \
+${depth}/rcldb/rclterms.cpp \
+${depth}/rcldb/searchdata.cpp \
+${depth}/rcldb/searchdataxml.cpp \
+${depth}/rcldb/stemdb.cpp \
+${depth}/rcldb/stoplist.cpp \
+${depth}/rcldb/synfamily.cpp \
+${depth}/unac/unac.cpp \
+${depth}/utils/appformime.cpp \
+${depth}/utils/base64.cpp \
+${depth}/utils/circache.cpp \
+${depth}/utils/closefrom.cpp \
+${depth}/utils/conftree.cpp \
+${depth}/utils/copyfile.cpp \
+${depth}/utils/cpuconf.cpp \
+${depth}/utils/debuglog.cpp \
+${depth}/utils/ecrontab.cpp \
+${depth}/utils/execmd.cpp \
+${depth}/utils/fstreewalk.cpp \
+${depth}/utils/idfile.cpp \
+${depth}/utils/fileudi.cpp \
+${depth}/utils/md5.cpp \
+${depth}/utils/mimeparse.cpp \
+${depth}/utils/netcon.cpp \
+${depth}/utils/pathut.cpp \
+${depth}/utils/pxattr.cpp \
+${depth}/utils/rclionice.cpp \
+${depth}/utils/readfile.cpp \
+${depth}/utils/smallut.cpp \
+${depth}/utils/strmatcher.cpp \
+${depth}/utils/transcode.cpp \
+${depth}/utils/wipedir.cpp \
+${depth}/utils/x11mon.cpp \
+"
+
+SRC_CC="\
+${depth}/bincimapmime/mime-parsefull.cc \
+${depth}/bincimapmime/mime-parseonlyheader.cc \
+${depth}/bincimapmime/mime-printbody.cc \
+${depth}/bincimapmime/mime.cc \
+${depth}/bincimapmime/convert.cc \
+${depth}/bincimapmime/iodevice.cc \
+${depth}/bincimapmime/iofactory.cc \
+"
+
+for c in $SRC_CPP;do
+    o=`basename $c .cpp`.o
+    OBJS="$OBJS $o"
+    d=`basename $c .cpp`.dep
+    cp /dev/null $d
+    s=`basename $c .cpp`.dep.stamp
+    DEPS="$DEPS $s"
+done
+for c in $SRC_CC;do
+    o=`basename $c .cc`.o
+    OBJS="$OBJS $o"
+    d=`basename $c .cc`.dep
+    cp /dev/null $d
+    s=`basename $c .cc`.dep.stamp
+    DEPS="$DEPS $s"
+done
+
+# The objects need to depend on the localdefs file in case it is
+# changed by a re-configure (it has the local compile flags)
+defs=\$\(depth\)/mk/localdefs
+
+test -f $mk && chmod +w $mk
+
+NODYNLIB=@NODYNLIB@
+RCLLIBVERSION=@RCLLIBVERSION@
+  
+cat > $mk <<EOF
+# DONT EDIT BY HAND: created by script mkMake
+depth = ${depth}
+include \$(depth)/mk/sysconf
+
+LIBRECOLL=librecoll.so.${RCLLIBVERSION}
+LIBS = librecoll.a
+${NODYNLIB}LIBS = librecoll.a \$(LIBRECOLL)
+
+all: \$(LIBS) 
+
+OBJS = $OBJS
+DEPS = $DEPS
+
+librecoll.a : \$(DEPS) \$(OBJS)
+	ar ru librecoll.a \$(OBJS)
+	\$(RANLIB) librecoll.a
+
+# Note that we are using the Recoll release number in the soname. There is
+# no effort whatsoever to maintain any kind of ABI compat in this lib. Only
+# programs or modules from the same Recoll release can be compatible.
+\$(LIBRECOLL): \$(DEPS) \$(OBJS)
+	\$(CXX) -shared -Wl,--no-undefined -Wl,--warn-unresolved-symbols \
+          -Wl,-soname=\$(LIBRECOLL) -o \$(LIBRECOLL) \$(OBJS) \
+           \$(LIBXAPIAN) \$(LIBICONV) \$(X_LIBX11) \$(LIBSYS)
+	rm -f librecoll.so
+	ln -s \$(LIBRECOLL) librecoll.so
+
+EOF
+
+for c in $SRC_CPP;do
+    o=`basename $c .cpp`.o
+    echo "$o : $c $defs" >> $mk
+    echo "	\$(CXX) \$(ALL_CXXFLAGS) -c $c" >> $mk
+done
+for c in $SRC_CC;do
+    o=`basename $c .cc`.o
+    echo "$o : $c $defs" >> $mk
+    echo "	\$(CXX) \$(ALL_CXXFLAGS) -c $c" >> $mk
+done
+
+cat >> $mk <<EOF
+depend: \$(DEPS)
+clean:
+	rm -f \$(OBJS) \$(LIBS) \$(DEPS) librecoll.so *.stamp
+	for i in *.dep;do test -f \$\$i && cp /dev/null \$\$i;done
+distclean: clean
+	rm -f *.dep   
+EOF
+
+for c in $SRC_CPP;do
+    d=`basename $c .cpp`.dep
+    s=`basename $c .cpp`.dep.stamp
+    echo "$s : $c $defs" >> $mk
+    echo "	\$(CXX) -M \$(ALL_CXXFLAGS) $c > $d" >> $mk
+    echo "	touch $s" >> $mk
+done
+for c in $SRC_CPP;do
+    d=`basename $c .cpp`.dep
+    echo "include $d" >> $mk
+done
+for c in $SRC_CC;do
+    d=`basename $c .cc`.dep
+    s=`basename $c .cc`.dep.stamp
+    echo "$s : $c $defs" >> $mk
+    echo "	\$(CXX) -M \$(ALL_CXXFLAGS) $c > $d" >> $mk
+    echo "	touch $s" >> $mk
+done
+for c in $SRC_CC;do
+    d=`basename $c .cc`.dep
+    echo "include $d" >> $mk
+done

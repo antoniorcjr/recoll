@@ -1,0 +1,9 @@
+#!/bin/sh
+# It may make sense in some cases to set this null filter (no output)
+# instead of using recoll_noindex or leaving the default filter in
+# case one doesn't want to install it: this will avoid endless retries
+# to reindex the affected files, as recoll will think it has succeeded
+# indexing them. Downside: the files won't be indexed when one
+# actually installs the real filter, will need a -z
+
+exit 0

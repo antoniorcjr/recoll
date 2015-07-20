@@ -1,0 +1,102 @@
+#!/bin/sh
+# @(#$Id: rclrtf,v 1.5 2007-06-08 13:51:09 dockes Exp $  (C) 2004 J.F.Dockes
+# Some inspiration from estraier
+#================================================================
+# convert rtf to html, by  executing the unrtf program:
+#    http://www.gnu.org/software/unrtf/unrtf.html
+#================================================================
+
+# set variables
+LANG=C ; export LANG
+LC_ALL=C ; export LC_ALL
+progname="rclrtl"
+filetype=rtf
+
+#RECFILTCOMMONCODE
+##############################################################################
+# !! Leave the previous line unmodified!! Code imported from the
+# recfiltcommon file
+
+# Utility code common to all shell filters. This could be sourced at run
+# time, but it's slightly more efficient to include the code in the
+# filters at build time (with a sed script).
+
+# Describe error in a way that can be interpreted by our caller
+senderror()
+{
+    echo RECFILTERROR $*
+    # Also alert on stderr just in case
+    echo ":2:$progname::: $*" 1>&2
+    exit 1
+}
+
+iscmd()
+{
+    cmd=$1
+    case $cmd in
+    */*)
+	if test -x $cmd -a ! -d $cmd ; then return 0; else return 1; fi ;;
+    *)
+      oldifs=$IFS; IFS=":"; set -- $PATH; IFS=$oldifs
+      for d in $*;do test -x $d/$cmd -a ! -d $d/$cmd && return 0;done
+      return 1 ;;
+    esac
+}
+
+checkcmds()
+{
+    for cmd in $*;do
+      if iscmd $cmd 
+      then 
+        a=1
+      else 
+        senderror HELPERNOTFOUND $cmd
+      fi
+    done
+}
+
+# show help message
+if test $# -ne 1 -o "$1" = "--help" 
+then
+  echo "Convert a $filetype file to HTML text for Recoll indexing."
+  echo "Usage: $progname [infile]"
+  exit 1
+fi
+
+infile="$1"
+
+# check the input file existence (may be '-' for stdin)
+if test "X$infile" != X- -a ! -f "$infile"
+then
+  senderror INPUTNOSUCHFILE "$infile"
+fi
+
+# protect access to our temp files and directories
+umask 77
+
+##############################################################################
+# !! Leave the following line unmodified !
+#ENDRECFILTCOMMONCODE
+
+checkcmds awk unrtf
+
+# output the result
+# The strange 'BEGIN' setup is to prevent 'file' from thinking this file
+# is an awk program
+# The thing about the charset is that unrtf outputs a garbled one.
+unrtf --nopict --html "$infile" 2> /dev/null |
+awk 'BEGIN'\
+' {
+  gothead = 0
+}
+/<\/head>/{
+    if (gothead == 0) {
+        printf("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n")
+	gothead = 1
+    }
+}
+/<meta http-equiv=/{next}
+{
+  print
+}
+' 

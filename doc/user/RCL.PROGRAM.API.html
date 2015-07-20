@@ -1,0 +1,251 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>4.3. API</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="Recoll user manual"><link rel="up" href="RCL.PROGRAM.html" title="Chapter 4. Programming interface"><link rel="prev" href="RCL.PROGRAM.FIELDS.html" title="4.2. Field data processing"><link rel="next" href="RCL.INSTALL.html" title="Chapter 5. Installation and configuration"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">4.3. API</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="RCL.PROGRAM.FIELDS.html">Prev</a> </td><th width="60%" align="center">Chapter 4. Programming interface</th><td width="20%" align="right"> <a accesskey="n" href="RCL.INSTALL.html">Next</a></td></tr></table><hr></div><div class="sect1" title="4.3. API"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="RCL.PROGRAM.API"></a>4.3. API</h2></div></div></div><div class="sect2" title="4.3.1. Interface elements"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.PROGRAM.API.ELEMENTS"></a>4.3.1. Interface elements</h3></div></div></div><p>A few elements in the interface are specific and and need
+      an explanation.</p><div class="variablelist"><dl><dt><span class="term">udi</span></dt><dd><p>An udi (unique document
+            identifier) identifies a document. Because of limitations
+            inside the index engine, it is restricted in length (to
+            200 bytes), which is why a regular URI cannot be used. The
+            structure and contents of the udi is defined by the
+            application and opaque to the index engine. For example,
+            the internal file system indexer uses the complete
+            document path (file path + internal path), truncated to
+            length, the suppressed part being replaced by a hash
+            value.</p></dd><dt><span class="term">ipath</span></dt><dd><p>This data value (set as a field in the Doc
+          object) is stored, along with the URL, but not indexed by
+          <span class="application">Recoll</span>. Its contents are not interpreted, and its use is up
+          to the application. For example, the <span class="application">Recoll</span> internal file
+          system indexer stores the part of the document access path
+          internal to the container file (<code class="literal">ipath</code> in
+          this case is a list of subdocument sequential numbers). url
+          and ipath are returned in every search result and permit
+          access to the original document.</p></dd><dt><span class="term">Stored and indexed fields</span></dt><dd><p>The <code class="filename">fields</code> file inside
+          the <span class="application">Recoll</span> configuration defines which document fields are
+          either "indexed" (searchable), "stored" (retrievable with
+          search results), or both.</p></dd></dl></div><p>Data for an external indexer, should be stored in a
+        separate index, not the one for the <span class="application">Recoll</span> internal file system
+        indexer, except if the latter is not used at all). The reason
+        is that the main document indexer purge pass would remove all
+        the other indexer's documents, as they were not seen during
+        indexing. The main indexer documents would also probably be a
+        problem for the external indexer purge operation.</p></div><div class="sect2" title="4.3.2. Python interface"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.PROGRAM.API.PYTHON"></a>4.3.2. Python interface</h3></div></div></div><div class="sect3" title="4.3.2.1. Introduction"><div class="titlepage"><div><div><h4 class="title"><a name="RCL.PROGRAM.PYTHON.INTRO"></a>4.3.2.1. Introduction</h4></div></div></div><p><span class="application">Recoll</span> versions after 1.11 define a Python programming
+          interface, both for searching and indexing. The indexing
+          portion has seen little use, but the searching one is used
+          in the Recoll Ubuntu Unity Lens and Recoll Web UI.</p><p>The API is inspired by the Python database API
+          specification. There were two major changes in recent <span class="application">Recoll</span>
+          versions:
+          </p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">The basis for the <span class="application">Recoll</span> API changed from Python
+              database API version 1.0 (<span class="application">Recoll</span> versions up to 1.18.1),
+              to version 2.0 (<span class="application">Recoll</span> 1.18.2 and later).</li><li class="listitem">The <code class="literal">recoll</code> module became a
+              package (with an internal <code class="literal">recoll</code>
+              module) as of <span class="application">Recoll</span> version 1.19, in order to add more
+              functions. For existing code, this only changes the way
+              the interface must be imported.</li></ul></div><p>
+        </p><p>We will mostly describe the new API and package
+          structure here. A paragraph at the end of this section will
+          explain a few differences and ways to write code
+          compatible with both versions.</p><p>The Python interface can be found in the source package,
+          under <code class="filename">python/recoll</code>.</p><p>The <code class="filename">python/recoll/</code> directory
+	  contains the usual <code class="filename">setup.py</code>. After
+	  configuring the main <span class="application">Recoll</span> code, you can use the script to
+	  build and install the Python module:
+          </p><pre class="screen">
+            <strong class="userinput"><code>cd recoll-xxx/python/recoll</code></strong>
+            <strong class="userinput"><code>python setup.py build</code></strong>
+            <strong class="userinput"><code>python setup.py install</code></strong>
+          </pre><p>
+        </p><p>The normal <span class="application">Recoll</span> installer installs the Python
+          API along with the main code.</p><p>When installing from a repository, and depending on the
+          distribution, the Python API can sometimes be found in a
+          separate package.</p></div><div class="sect3" title="4.3.2.2. Recoll package"><div class="titlepage"><div><div><h4 class="title"><a name="RCL.PROGRAM.PYTHON.PACKAGE"></a>4.3.2.2. Recoll package</h4></div></div></div><p>The <code class="literal">recoll</code> package contains two
+          modules:
+          </p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>The <code class="literal">recoll</code> module contains
+                functions and classes used to query (or update) the
+                index.</p></li><li class="listitem"><p>The <code class="literal">rclextract</code> module contains
+                functions and classes used to access document
+                data.</p></li></ul></div><p>
+        </p></div><div class="sect3" title="4.3.2.3. The recoll module"><div class="titlepage"><div><div><h4 class="title"><a name="RCL.PROGRAM.PYTHON.RECOLL"></a>4.3.2.3. The recoll module</h4></div></div></div><div class="sect4" title="Functions"><div class="titlepage"><div><div><h5 class="title"><a name="RCL.PROGRAM.PYTHON.RECOLL.FUNCTIONS"></a>Functions</h5></div></div></div><div class="variablelist"><dl><dt><span class="term">connect(confdir=None, extra_dbs=None,
+                writable = False)</span></dt><dd>
+                The <code class="literal">connect()</code> function connects to
+                one or several <span class="application">Recoll</span> index(es) and returns
+                a <code class="literal">Db</code> object.
+                <div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><code class="literal">confdir</code> may specify
+                    a configuration directory. The usual defaults
+                    apply.</li><li class="listitem"><code class="literal">extra_dbs</code> is a list of
+                  additional indexes (Xapian directories). </li><li class="listitem"><code class="literal">writable</code> decides if
+                    we can index new data through this
+                    connection.</li></ul></div> 
+                This call initializes the recoll module, and it should
+                always be performed before any other call or object creation.
+              </dd></dl></div></div><div class="sect4" title="Classes"><div class="titlepage"><div><div><h5 class="title"><a name="RCL.PROGRAM.PYTHON.RECOLL.CLASSES"></a>Classes</h5></div></div></div><div class="sect5" title="The Db class"><div class="titlepage"><div><div><h6 class="title"><a name="RCL.PROGRAM.PYTHON.RECOLL.CLASSES.DB"></a>The Db class</h6></div></div></div><p>A Db object is created by
+            a <code class="literal">connect()</code> call and holds a 
+            connection to a Recoll index.</p><div class="variablelist" title="Methods"><p class="title"><b>Methods</b></p><dl><dt><span class="term">Db.close()</span></dt><dd>Closes the connection. You can't do anything
+                with the <code class="literal">Db</code> object after
+                this.</dd><dt><span class="term">Db.query(), Db.cursor()</span></dt><dd>These
+                aliases return a blank <code class="literal">Query</code> object
+                for this index.</dd><dt><span class="term">Db.setAbstractParams(maxchars,
+              contextwords)</span></dt><dd>Set the parameters used
+              to build snippets (sets of keywords in context text
+              fragments). <code class="literal">maxchars</code> defines the
+                maximum total size of the abstract. 
+                <code class="literal">contextwords</code> defines how many
+                terms are shown around the keyword.</dd><dt><span class="term">Db.termMatch(match_type, expr, field='',
+	        maxlen=-1, casesens=False, diacsens=False, lang='english')
+                </span></dt><dd>Expand an expression against the
+                index term list. Performs the basic function from the
+                GUI term explorer tool. <code class="literal">match_type</code>
+                can be either
+                of <code class="literal">wildcard</code>, <code class="literal">regexp</code>
+                or <code class="literal">stem</code>. Returns a list of terms
+                expanded from the input expression.
+              </dd></dl></div></div><div class="sect5" title="The Query class"><div class="titlepage"><div><div><h6 class="title"><a name="RCL.PROGRAM.PYTHON.RECOLL.CLASSES.QUERY"></a>The Query class</h6></div></div></div><p>A <code class="literal">Query</code> object (equivalent to a
+            cursor in the Python DB API) is created by
+            a <code class="literal">Db.query()</code> call. It is used to
+            execute index searches.</p><div class="variablelist" title="Methods"><p class="title"><b>Methods</b></p><dl><dt><span class="term">Query.sortby(fieldname, ascending=True)</span></dt><dd>Sort results
+                by <em class="replaceable"><code>fieldname</code></em>, in ascending
+                or descending order. Must be called before executing
+                the search.</dd><dt><span class="term">Query.execute(query_string, stemming=1, 
+                stemlang="english")</span></dt><dd>Starts a search
+              for <em class="replaceable"><code>query_string</code></em>, a <span class="application">Recoll</span>
+              search language string.</dd><dt><span class="term">Query.executesd(SearchData)</span></dt><dd>Starts a search for the query defined by the
+                SearchData object.</dd><dt><span class="term">Query.fetchmany(size=query.arraysize)</span></dt><dd>Fetches
+                the next <code class="literal">Doc</code> objects in the current
+                search results, and returns them as an array of the
+                required size, which is by default the value of
+                the <code class="literal">arraysize</code> data member.</dd><dt><span class="term">Query.fetchone()</span></dt><dd>Fetches the next <code class="literal">Doc</code> object
+                from the current search results.</dd><dt><span class="term">Query.close()</span></dt><dd>Closes the query. The object is unusable
+              after the call.</dd><dt><span class="term">Query.scroll(value, mode='relative')</span></dt><dd>Adjusts the position in the current result
+                set. <code class="literal">mode</code> can
+                be <code class="literal">relative</code>
+                or <code class="literal">absolute</code>. </dd><dt><span class="term">Query.getgroups()</span></dt><dd>Retrieves the expanded query terms as a list
+                of pairs. Meaningful only after executexx In each
+                pair, the first entry is a list of user terms (of size
+                one for simple terms, or more for group and phrase
+                clauses), the second a list of query terms as derived
+                from the user terms and used in the Xapian
+                Query.</dd><dt><span class="term">Query.getxquery()</span></dt><dd>Return the Xapian query description as a Unicode string.
+              Meaningful only after executexx.</dd><dt><span class="term">Query.highlight(text, ishtml = 0, methods = object)</span></dt><dd>Will insert &lt;span "class=rclmatch"&gt;,
+            &lt;/span&gt; tags around the match areas in the input text
+              and return the modified text.  <code class="literal">ishtml</code>
+              can be set to indicate that the input text is HTML and
+              that HTML special characters should not be escaped.
+              <code class="literal">methods</code> if set should be an object
+              with methods startMatch(i) and endMatch() which will be
+              called for each match and should return a begin and end
+              tag</dd><dt><span class="term">Query.makedocabstract(doc, methods = object))</span></dt><dd>Create a snippets abstract
+                for <code class="literal">doc</code> (a <code class="literal">Doc</code>
+                object) by selecting text around the match terms.
+                If methods is set, will also perform highlighting. See
+                the highlight method.
+              </dd><dt><span class="term">Query.__iter__() and Query.next()</span></dt><dd>So that things like <code class="literal">for doc in
+                  query:</code> will work.</dd></dl></div><div class="variablelist" title="Data descriptors"><p class="title"><b>Data descriptors</b></p><dl><dt><span class="term">Query.arraysize</span></dt><dd>Default
+                number of records processed by fetchmany (r/w).</dd><dt><span class="term">Query.rowcount</span></dt><dd>Number of
+                records returned by the last execute.</dd><dt><span class="term">Query.rownumber</span></dt><dd>Next index
+                to be fetched from results. Normally increments after
+                each fetchone() call, but can be set/reset before the
+                call to effect seeking (equivalent to
+                using <code class="literal">scroll()</code>). Starts at
+                0.</dd></dl></div></div><div class="sect5" title="The Doc class"><div class="titlepage"><div><div><h6 class="title"><a name="RCL.PROGRAM.PYTHON.RECOLL.CLASSES.DOC"></a>The Doc class</h6></div></div></div><p>A <code class="literal">Doc</code> object contains index data
+            for a given document. The data is extracted from the
+            index when searching, or set by the indexer program when
+            updating. The Doc object has many attributes to be read or
+            set by its user. It matches exactly the Rcl::Doc C++
+            object. Some of the attributes are predefined, but,
+            especially when indexing, others can be set, the name of
+            which will be processed as field names by the indexing
+            configuration.  Inputs can be specified as Unicode or
+            strings. Outputs are Unicode objects. All dates are
+            specified as Unix timestamps, printed as strings. Please
+            refer to the <code class="filename">rcldb/rcldoc.h</code> C++ file
+            for a description of the predefined attributes.</p><p>At query time, only the fields that are defined
+            as <code class="literal">stored</code> either by default or in
+            the <code class="filename">fields</code> configuration file will be
+            meaningful in the <code class="literal">Doc</code>
+            object. Especially this will not be the case for the
+            document text. See the <code class="literal">rclextract</code>
+            module for accessing document contents.</p><div class="variablelist" title="Methods"><p class="title"><b>Methods</b></p><dl><dt><span class="term">get(key), [] operator</span></dt><dd>Retrieve the named doc attribute</dd><dt><span class="term">getbinurl()</span></dt><dd>Retrieve
+                the URL in byte array format (no transcoding), for use as
+                parameter to a system call.</dd><dt><span class="term">items()</span></dt><dd>Return a dictionary of doc object
+              keys/values</dd><dt><span class="term">keys()</span></dt><dd>list of doc object keys (attribute
+              names).</dd></dl></div></div><div class="sect5" title="The SearchData class"><div class="titlepage"><div><div><h6 class="title"><a name="RCL.PROGRAM.PYTHON.RECOLL.CLASSES.SEARCHDATA"></a>The SearchData class</h6></div></div></div><p>A <code class="literal">SearchData</code> object allows building
+            a query by combining clauses, for execution
+            by <code class="literal">Query.executesd()</code>. It can be used
+            in replacement of the query language approach. The
+            interface is going to change a little, so no detailed doc
+            for now...</p><div class="variablelist" title="Methods"><p class="title"><b>Methods</b></p><dl><dt><span class="term">addclause(type='and'|'or'|'excl'|'phrase'|'near'|'sub',
+                qstring=string, slack=0, field='', stemming=1,
+                subSearch=SearchData)</span></dt><dd></dd></dl></div></div></div></div><div class="sect3" title="4.3.2.4. The rclextract module"><div class="titlepage"><div><div><h4 class="title"><a name="RCL.PROGRAM.PYTHON.RCLEXTRACT"></a>4.3.2.4. The rclextract module</h4></div></div></div><p>Index queries do not provide document content (only a
+          partial and unprecise reconstruction is performed to show the
+          snippets text). In order to access the actual document data, 
+          the data extraction part of the indexing process
+          must be performed (subdocument access and format
+          translation). This is not trivial in
+          general. The <code class="literal">rclextract</code> module currently
+          provides a single class which can be used to access the data
+          content for result documents.</p><div class="sect4" title="Classes"><div class="titlepage"><div><div><h5 class="title"><a name="RCL.PROGRAM.PYTHON.RCLEXTRACT.CLASSES"></a>Classes</h5></div></div></div><div class="sect5" title="The Extractor class"><div class="titlepage"><div><div><h6 class="title"><a name="RCL.PROGRAM.PYTHON.RECOLL.CLASSES.EXTRACTOR"></a>The Extractor class</h6></div></div></div><div class="variablelist" title="Methods"><p class="title"><b>Methods</b></p><dl><dt><span class="term">Extractor(doc)</span></dt><dd>An <code class="literal">Extractor</code> object is
+                  built from a <code class="literal">Doc</code> object, output
+                  from a query.</dd><dt><span class="term">Extractor.textextract(ipath)</span></dt><dd>Extract document defined
+                by <em class="replaceable"><code>ipath</code></em> and return
+                a <code class="literal">Doc</code> object. The doc.text field
+                has the document text converted to either text/plain or
+                text/html according to doc.mimetype. The typical use
+                would be as follows:
+                  <pre class="programlisting">
+qdoc = query.fetchone()
+extractor = recoll.Extractor(qdoc)
+doc = extractor.textextract(qdoc.ipath)
+# use doc.text, e.g. for previewing
+</pre></dd><dt><span class="term">Extractor.idoctofile(ipath, targetmtype, outfile='')</span></dt><dd>Extracts document into an output file,
+                  which can be given explicitly or will be created as a
+                  temporary file to be deleted by the caller. Typical use:
+                  <pre class="programlisting">
+qdoc = query.fetchone()
+extractor = recoll.Extractor(qdoc)
+filename = extractor.idoctofile(qdoc.ipath, qdoc.mimetype)</pre></dd></dl></div></div></div></div><div class="sect3" title="4.3.2.5. Example code"><div class="titlepage"><div><div><h4 class="title"><a name="RCL.PROGRAM.PYTHON.EXAMPLES"></a>4.3.2.5. Example code</h4></div></div></div><p>The following sample would query the index with a user
+        language string. See the <code class="filename">python/samples</code>
+          directory inside the <span class="application">Recoll</span> source for other
+          examples. The <code class="filename">recollgui</code> subdirectory
+          has a very embryonic GUI which demonstrates the
+          highlighting and data extraction functions.</p><pre class="programlisting">
+#!/usr/bin/env python
+
+from recoll import recoll
+
+db = recoll.connect()
+db.setAbstractParams(maxchars=80, contextwords=4)
+
+query = db.query()
+nres = query.execute("some user question")
+print "Result count: ", nres
+if nres &gt; 5:
+    nres = 5
+for i in range(nres):
+    doc = query.fetchone()
+    print "Result #%d" % (query.rownumber,)
+    for k in ("title", "size"):
+        print k, ":", getattr(doc, k).encode('utf-8')
+    abs = db.makeDocAbstract(doc, query).encode('utf-8')
+    print abs
+    print
+
+
+</pre></div><div class="sect3" title="4.3.2.6. Compatibility with the previous version"><div class="titlepage"><div><div><h4 class="title"><a name="RCL.PROGRAM.PYTHON.COMPAT"></a>4.3.2.6. Compatibility with the previous version</h4></div></div></div><p>The following code fragments can be used to ensure that
+          code can run with both the old and the new API (as long as it
+          does not use the new abilities of the new API of
+          course).</p><p>Adapting to the new package structure:</p><pre class="programlisting">
+
+try:
+    from recoll import recoll
+    from recoll import rclextract
+    hasextract = True
+except:
+    import recoll
+    hasextract = False
+
+</pre><p>Adapting to the change of nature of
+          the <code class="literal">next</code> <code class="literal">Query</code>
+          member. The same test can be used to choose to use
+          the <code class="literal">scroll()</code> method (new) or set
+          the <code class="literal">next</code> value (old).</p><pre class="programlisting">
+
+       rownum = query.next if type(query.next) == int else \
+                 query.rownumber
+
+</pre></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="RCL.PROGRAM.FIELDS.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="RCL.PROGRAM.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="RCL.INSTALL.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">4.2. Field data processing </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Chapter 5. Installation and configuration</td></tr></table></div></body></html>

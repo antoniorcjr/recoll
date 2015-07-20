@@ -1,0 +1,234 @@
+# (C) 2004 J.F.Dockes
+# Associations of file name extensions to mime types
+
+.txt = text/plain
+.text = text/plain
+.srt = text/plain
+.ini = text/x-ini
+.csv = text/x-csv
+
+# Source files. 
+# Defining them with specific types allows using a specific ext viewer (in 
+# mimeview). You can in general use rcltext to wrap them in html for
+# indexing the contents (and rough preview). You could also just set them
+# as text/plain (index as text, use text viewer)
+.cpp = text/x-c
+.h   = text/x-c
+.c   = text/x-c
+.cc  = text/x-c
+.cxx = text/x-c
+.hxx = text/x-c
+.f   = text/x-fortran
+.py  = text/x-python
+.awk = application/x-awk
+.pl = application/x-perl
+.sh = application/x-shellscript
+.tcl = text/x-tcl
+
+.xml = text/xml
+
+.note = application/x-gnote
+
+.rtf  = text/rtf
+
+.html = text/html
+.htm = text/html
+.shtml = text/html
+.php = text/html
+.ics = text/calendar
+
+# .eml is used as an extension by several mail apps for a single message
+# saved in raw MIME format. Mainly used here to get Thunderbird to open an
+# extracted message.
+.eml = message/rfc822
+
+.pdf = application/pdf
+
+.ps = application/postscript
+.eps = application/postscript
+.ai = application/postscript
+
+.tex = application/x-tex
+.dvi = application/x-dvi
+
+.djvu = image/vnd.djvu
+.svg = image/svg+xml
+.dia = application/x-dia-diagram
+
+.gz = application/x-gzip
+.Z = application/x-gzip
+.bz2 = application/x-bzip2
+.rar = application/x-rar
+#.Z  = application/x-compress
+.zip = application/zip
+
+# The rcltar module can handle compressed tar formats internally so we
+# use application/x-tar for all tar files compressed or not. Note that tar
+# file indexing is disabled by default, you'll need to copy and uncomment
+# the application/x-tar commented line from mimeconf into your personal config
+.tar = application/x-tar
+.tar.gz = application/x-tar
+.tgz = application/x-tar
+.tbz = application/x-tar
+.tar.bz2 = application/x-tar
+
+.doc = application/msword
+.dot = application/msword
+.ppt = application/vnd.ms-powerpoint
+.pps = application/vnd.ms-powerpoint
+.pot = application/vnd.ms-powerpoint
+.xls = application/vnd.ms-excel
+.xla = application/vnd.ms-excel
+
+.chm = application/x-chm
+
+.epub = application/epub+zip
+.mobi = application/x-mobipocket-ebook 
+
+# OpenOffice / opendocument. We handle opendocument as old openoffice files
+# for now
+.sxc = application/vnd.sun.xml.calc
+.ods = application/vnd.sun.xml.calc
+.stc = application/vnd.sun.xml.calc.template
+.sxd = application/vnd.sun.xml.draw
+.odg = application/vnd.sun.xml.draw
+.std = application/vnd.sun.xml.draw.template
+.sxi = application/vnd.sun.xml.impress
+.odp = application/vnd.sun.xml.impress
+.sti = application/vnd.sun.xml.impress.template
+.sxm = application/vnd.sun.xml.math
+.sxw = application/vnd.sun.xml.writer
+.odt = application/vnd.sun.xml.writer
+.sxg = application/vnd.sun.xml.writer.global
+.stw = application/vnd.sun.xml.writer.template
+
+# ms openxml 
+.docm = application/vnd.ms-word.document.macroEnabled.12
+.docx = application/vnd.openxmlformats-officedocument.wordprocessingml.document
+.dotm = application/vnd.ms-word.template.macroEnabled.12
+.dotx = application/vnd.openxmlformats-officedocument.wordprocessingml.template
+.potm = application/vnd.ms-powerpoint.template.macroEnabled.12
+.potx = application/vnd.openxmlformats-officedocument.presentationml.template
+.ppam = application/vnd.ms-powerpoint.addin.macroEnabled.12
+.ppsm = application/vnd.ms-powerpoint.slideshow.macroEnabled.12
+.ppsx = application/vnd.openxmlformats-officedocument.presentationml.slideshow
+.pptm = application/vnd.ms-powerpoint.presentation.macroEnabled.12
+.pptx = application/vnd.openxmlformats-officedocument.presentationml.presentation
+.xlam = application/vnd.ms-excel.addin.macroEnabled.12
+.xlsb = application/vnd.ms-excel.sheet.binary.macroEnabled.12
+.xlsm = application/vnd.ms-excel.sheet.macroEnabled.12
+.xlsx = application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+.xltm = application/vnd.ms-excel.template.macroEnabled.12
+.xltx = application/vnd.openxmlformats-officedocument.spreadsheetml.template
+ 
+.abw = application/x-abiword
+.lyx = application/x-lyx
+.sla = application/x-scribus
+.scd = application/x-scribus
+.info = application/x-gnuinfo
+.kwd = application/x-kword
+.gnumeric = application/x-gnumeric
+.gnm = application/x-gnumeric
+
+.wpd = application/vnd.wordperfect
+
+.rtf = text/rtf
+
+.mp3 = audio/mpeg
+.flac = application/x-flac
+.ogg = application/ogg
+.oga = application/ogg
+# Note: file -i says audio/x-midi, but soft karaoke files are special.
+.kar = audio/x-karaoke
+.mid = audio/x-karaoke
+.aac = audio/aac
+.m4a = audio/mp4
+
+.mkv = video/x-matroska
+.ogv = video/ogg
+
+.png = image/png
+.jp2 = image/jp2
+.jpg = image/jpeg
+.jpeg = image/jpeg
+.gif = image/gif
+.tiff = image/tiff
+.tif  = image/tiff
+.xcf  = image/x-xcf
+.bmp = image/bmp
+.xpm = image/x-xpmi
+
+.fb2 = text/x-fictionbook
+
+.war = application/x-webarchive
+.mht = application/x-mimehtml
+.mhtml = application/x-mimehtml
+
+# A list of suffixes (name endings) that we don't want to touch at all.
+# Having these explicitely listed speeds things up a bit by avoiding
+# unneeded decompression or 'file' calls. File names still get indexed if
+# indexallfilenames is set (so this is different from skippedNames). It's a
+# bit unconsistent to have it listed among the suffix translations, but no
+# problem in practice.
+recoll_noindex = .md5 .map \
+       .o .lib .dll .a .sys .exe .com \
+       .mpp .mpt .vsd \
+	   .img .img.gz .img.bz2 .img.xz .image .image.gz .image.bz2 .image.xz \
+       .dat .bak .rdf .log.gz .log .db .msf .pid \
+       ,v ~ #
+
+# Special handling of .txt files inside ~/.gaim and ~/.purple directories
+[~/.gaim]
+.txt = text/x-gaim-log
+[~/.purple]
+.txt = text/x-purple-log
+.html = text/x-purple-html-log
+
+# Special handling of aptosid manual menu system
+[/usr/share/aptosid-manual]
+.htm = text/x-html-aptosid-man
+.html = text/x-html-aptosid-man
+
+# Special handling of sidux manual menu system
+[/usr/share/sidux-manual]
+.htm = text/x-html-sidux-man
+.html = text/x-html-sidux-man
+
+# Manual files. You may want to adjust the location for your system
+# We can't use the default text/troff type because this doesn't say
+# what macro set to use (groff -man)
+[/usr/share/man]
+.0p = text/x-man
+.1 = text/x-man
+.1m = text/x-man
+.1p = text/x-man
+.1ssl = text/x-man
+.1x = text/x-man
+.2 = text/x-man
+.3 = text/x-man
+.3curses = text/x-man
+.3form = text/x-man
+.3gl = text/x-man
+.3menu = text/x-man
+.3ncurses = text/x-man
+.3p = text/x-man
+.3pm = text/x-man
+.3ssl = text/x-man
+.3tiff = text/x-man
+.3x = text/x-man
+.4 = text/x-man
+.5 = text/x-man
+.5ssl = text/x-man
+.6 = text/x-man
+.6x = text/x-man
+.7 = text/x-man
+.7ssl = text/x-man
+.8 = text/x-man
+.9 = text/x-man
+.n = text/x-man
+
+# Special handling for okular notes
+[~/.kde4/share/apps/okular/docdata]
+.xml = application/x-okular-notes
+[~/.kde/share/apps/okular/docdata]
+.xml = application/x-okular-notes

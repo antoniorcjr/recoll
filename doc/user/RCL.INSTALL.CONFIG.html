@@ -1,0 +1,704 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>5.4. Configuration overview</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="Recoll user manual"><link rel="up" href="RCL.INSTALL.html" title="Chapter 5. Installation and configuration"><link rel="prev" href="RCL.INSTALL.BUILDING.html" title="5.3. Building from source"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">5.4. Configuration overview</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="RCL.INSTALL.BUILDING.html">Prev</a> </td><th width="60%" align="center">Chapter 5. Installation and configuration</th><td width="20%" align="right"> </td></tr></table><hr></div><div class="sect1" title="5.4. Configuration overview"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="RCL.INSTALL.CONFIG"></a>5.4. Configuration overview</h2></div></div></div><p>Most of the parameters specific to the
+        <span class="command"><strong>recoll</strong></span> GUI are set through the
+        <span class="guilabel">Preferences</span> menu and stored in the standard Qt
+        place (<code class="filename">$HOME/.config/Recoll.org/recoll.conf</code>).
+        You probably do not want to edit this by hand.</p><p><span class="application">Recoll</span> indexing options are set inside text configuration
+        files located in a configuration directory. There can be
+        several such directories, each of which defines the parameters
+        for one index.</p><p>The configuration files can be edited by hand or through
+        the <span class="guilabel">Index configuration</span> dialog 
+        (<span class="guilabel">Preferences</span> menu). The GUI tool will try
+        to respect your formatting and comments as much as possible,
+        so it is quite possible to use both ways.</p><p>The most accurate documentation for the
+        configuration parameters is given by comments inside the default
+        files, and we will just give a general overview here.</p><p>By default, for each index, there are two sets of
+        configuration files. System-wide configuration files are kept
+        in a directory named
+        like <code class="filename">/usr/[local/]share/recoll/examples</code>,
+        and define default values, shared by all indexes. For each
+        index, a parallel set of files defines the customized
+        parameters.</p><p>In addition (as of <span class="application">Recoll</span> version 1.19.7), it is possible
+        to specify two additional configuration directories which will
+        be stacked before and after the user configuration
+        directory. These are defined by
+        the <code class="envar">RECOLL_CONFTOP</code>
+        and <code class="envar">RECOLL_CONFMID</code> environment
+        variables. Values from configuration files inside the top
+        directory will override user ones, values from configuration
+        files inside the middle directory will override system ones
+        and be overriden by user ones. These two variables may be of
+        use to applications which augment <span class="application">Recoll</span> functionality, and
+        need to add configuration data without disturbing the user's
+        files. Please note that the two, currently single, values will
+        probably be interpreted as colon-separated lists in the
+        future: do not use colon characters inside the directory
+        paths.</p><p>The default location of the configuration is the
+        <code class="filename">.recoll</code>
+        directory in your home. Most people will only use this
+        directory.</p><p>This location can be changed, or others can be added with the
+        <code class="envar">RECOLL_CONFDIR</code> environment variable or the
+        <code class="option">-c</code> option parameter to <span class="command"><strong>recoll</strong></span> and
+        <span class="command"><strong>recollindex</strong></span>.</p><p>If the <code class="filename">.recoll</code> directory does not
+        exist when <span class="command"><strong>recoll</strong></span> or
+        <span class="command"><strong>recollindex</strong></span> are started, it will be created
+        with a set of empty configuration files.
+        <span class="command"><strong>recoll</strong></span> will give you a chance to edit the
+        configuration file before starting
+        indexing. <span class="command"><strong>recollindex</strong></span> will proceed
+        immediately. To avoid mistakes, the automatic directory
+        creation will only occur for the
+       default location, not if <code class="option">-c</code> or
+       <code class="envar">RECOLL_CONFDIR</code> were used (in the latter
+       cases, you will have to create the directory).</p><p>All configuration files share the same format. For
+        example, a short extract of the main configuration file might
+        look as follows:</p><pre class="programlisting">
+        # Space-separated list of directories to index.
+        topdirs =  ~/docs /usr/share/doc
+
+        [~/somedirectory-with-utf8-txt-files]
+        defaultcharset = utf-8
+        </pre><p>There are three kinds of lines: </p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>Comment (starts with
+          <span class="emphasis"><em>#</em></span>) or empty.</p></li><li class="listitem"><p>Parameter affectation (<span class="emphasis"><em>name =
+          value</em></span>).</p></li><li class="listitem"><p>Section definition
+          ([<span class="emphasis"><em>somedirname</em></span>]).</p></li></ul></div><p>Depending on the type of configuration file, section
+        definitions either separate groups of parameters or allow
+        redefining some parameters for a directory sub-tree. They stay
+        in effect until another section definition, or the end of
+        file, is encountered. Some of the parameters used for indexing
+        are looked up hierarchically from the current directory
+        location upwards. Not all parameters can be meaningfully
+        redefined, this is specified for each in the next
+        section. </p><p>When found at the beginning of a file path, the tilde
+        character (~) is expanded to the name of the user's home
+        directory, as a shell would do.</p><p>White space is used for separation inside  lists.
+        List elements with embedded spaces can be quoted using
+        double-quotes.</p><p title="Encoding issues"><b>Encoding issues. </b>Most of the configuration parameters are plain ASCII. Two
+        particular sets of values may cause encoding issues:</p><p>
+      </p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>File path parameters may contain non-ascii
+        characters and should use the exact same byte values as found in
+        the file system directory. Usually, this means that the
+        configuration file should use the system default locale
+        encoding.</p></li><li class="listitem"><p>The <code class="envar">unac_except_trans</code> parameter
+        should be encoded in UTF-8. If your system locale is not UTF-8, and
+        you need to also specify non-ascii file paths, this poses a
+        difficulty because common text editors cannot handle multiple
+        encodings in a single file. In this relatively unlikely case, you
+        can edit the configuration file as two separate text files with
+        appropriate encodings, and concatenate them to create the complete
+        configuration.</p></li></ul></div><p>
+      </p><div class="sect2" title="5.4.1. The main configuration file, recoll.conf"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.INSTALL.CONFIG.RECOLLCONF"></a>5.4.1. The main configuration file, recoll.conf</h3></div></div></div><p><code class="filename">recoll.conf</code> is the main
+         configuration file. It defines things like
+         what to index (top directories and things to ignore), and the
+         default character set to use for document types which do not
+         specify it internally.</p><p>The default configuration will index your home
+         directory. If this is not appropriate, start
+         <span class="command"><strong>recoll</strong></span> to create a blank 
+         configuration, click <span class="guimenu">Cancel</span>, and edit
+         the configuration file before restarting the command. This
+         will start the initial indexing, which may take some time.</p><p>Most of the following parameters can be changed from the
+        <span class="guilabel">Index Configuration</span> menu in the
+        <span class="command"><strong>recoll</strong></span> interface. Some can only be set by
+        editing the configuration file.</p><div class="sect3" title="5.4.1.1. Parameters affecting what documents we index:"><div class="titlepage"><div><div><h4 class="title"><a name="RCL.INSTALL.CONFIG.RECOLLCONF.FILES"></a>5.4.1.1. Parameters affecting what documents we index:</h4></div></div></div><div class="variablelist"><dl><dt><a name="RCL.INSTALL.CONFIG.RECOLLCONF.TOPDIRS"></a><span class="term"><code class="varname">topdirs</code></span></dt><dd><p>Specifies the list of directories or files to
+            index (recursively for directories). You can use symbolic links
+            as elements of this list. See the
+            <code class="varname">followLinks</code> option about following symbolic links
+            found under the top elements (not followed by default).</p></dd><dt><span class="term"><code class="varname">skippedNames</code></span></dt><dd><p>A space-separated list of wilcard patterns for
+               names of files or directories that should be completely
+               ignored. The list defined in the default file is: </p><pre class="programlisting">
+skippedNames = #* bin CVS  Cache cache* caughtspam  tmp .thumbnails .svn \
+ 	       *~ .beagle .git .hg .bzr loop.ps .xsession-errors \
+	       .recoll* xapiandb recollrc recoll.conf 
+</pre><p>The list can be redefined at any sub-directory in the
+		indexed area.</p><p>The top-level directories are not affected by this
+                list (that is, a directory in <code class="varname">topdirs</code>
+                might match and would still be indexed).</p><p>The list in the default configuration does not
+                exclude hidden directories (names beginning with a
+                dot), which means that it may index quite a few things
+                that you do not want. On the other hand, email user
+                agents like <span class="application">thunderbird</span>
+                usually store messages in hidden directories, and you
+                probably want this indexed. One possible solution is to
+                have <code class="filename">.*</code> in
+                <code class="varname">skippedNames</code>, and add things like
+                <code class="filename">~/.thunderbird</code> or
+                <code class="filename">~/.evolution</code> in
+                <code class="varname">topdirs</code>.</p><p>Not even the file names are indexed for patterns
+                in this list. See the
+                <code class="varname">recoll_noindex</code> variable in
+                <code class="filename">mimemap</code> for an alternative
+                approach which indexes the file names.</p></dd><dt><span class="term"><code class="varname">skippedPaths</code> and
+             <code class="varname">daemSkippedPaths</code> </span></dt><dd><p>A space-separated list of patterns for
+               <span class="emphasis"><em>paths</em></span> of files or directories that should be skipped.
+               There is no default in the sample configuration file,
+               but the code always adds the configuration and database
+               directories in there.</p><p><code class="varname">skippedPaths</code> is used both by
+              batch and real time
+              indexing. <code class="varname">daemSkippedPaths</code> can be
+              used to specify things that should be indexed at
+              startup, but not monitored.</p><p>Example of use for skipping text files only in a
+              specific directory:</p><pre class="programlisting">
+skippedPaths = ~/somedir/*.txt
+              </pre></dd><dt><a name="RCL.INSTALL.CONFIG.RECOLLCONF.SKIPPEDPATHSFNMPATHNAME"></a><span class="term"><code class="varname">skippedPathsFnmPathname</code></span></dt><dd><p>The values in the
+                <code class="varname">*skippedPaths</code> variables are matched by
+                default with <code class="literal">fnmatch(3)</code>, with the
+                FNM_PATHNAME flag. This means that '/'
+                characters must be matched explicitely. You can set
+                <code class="varname">skippedPathsFnmPathname</code> to 0 to disable
+                the use of FNM_PATHNAME (meaning that /*/dir3 will match
+                /dir1/dir2/dir3).</p></dd><dt><a name="RCL.INSTALL.CONFIG.RECOLLCONF.ZIPSKIPPEDNAMES"></a><span class="term"><code class="varname">zipSkippedNames</code></span></dt><dd><p>A space-separated list of patterns for
+               names of files or directories that should be ignored
+               inside zip archives. This is used directly by the zip
+               handler, and has a function similar to skippedNames, but
+               works independantly. Can be redefined for filesystem
+               subdirectories. For versions up to 1.19, you will need
+               to update the Zip handler and install a supplementary
+               Python module. The details are
+               described <a class="ulink" href="https://bitbucket.org/medoc/recoll/wiki/Filtering%20out%20Zip%20archive%20members" target="_top">on
+		  the <span class="application">Recoll</span> wiki</a>.
+	    </p></dd><dt><a name="RCL.INSTALL.CONFIG.RECOLLCONF.FOLLOWLINKS"></a><span class="term"><code class="varname">followLinks</code></span></dt><dd><p>Specifies if the indexer should follow
+            symbolic links while walking the file tree. The default is
+            to ignore symbolic links to avoid multiple indexing of
+            linked files. No effort is made to avoid duplication when
+            this option is set to true. This option can be set
+            individually for each of the <code class="varname">topdirs</code>
+            members by using sections. It can not be changed below the
+            <code class="varname">topdirs</code> level.</p></dd><dt><span class="term"><code class="varname">indexedmimetypes</code></span></dt><dd><p><span class="application">Recoll</span> normally indexes any file which it
+            knows how to read. This list lets you restrict the indexed
+            MIME types to what you specify. If the variable is
+            unspecified or the list empty (the default), all supported
+            types are processed. Can be redefined for subdirectories.</p></dd><dt><span class="term"><code class="varname">excludedmimetypes</code></span></dt><dd><p> This list lets you exclude some MIME types from
+            indexing. Can be redefined for subdirectories.</p></dd><dt><span class="term"><code class="varname">compressedfilemaxkbs</code></span></dt><dd><p>Size limit for compressed (.gz or .bz2)
+            files. These need to be decompressed in a temporary
+            directory for identification, which can be very wasteful
+            if 'uninteresting' big compressed files are present.
+            Negative means no limit, 0 means no processing of any
+            compressed file. Defaults to -1.</p></dd><dt><span class="term"><code class="varname">textfilemaxmbs</code></span></dt><dd><p>Maximum size for text files. Very big text
+            files are often uninteresting logs. Set to -1 to disable
+            (default 20MB).</p></dd><dt><span class="term"><code class="varname">textfilepagekbs</code></span></dt><dd><p>If set to other than -1, text files will be
+            indexed as multiple documents of the given page size. This may
+            be useful if you do want to index very big text files as it
+            will both reduce memory usage at index time and help with
+            loading data to the preview window. A size of a few megabytes
+            would seem reasonable (default: 1MB).</p></dd><dt><span class="term"><code class="varname">membermaxkbs</code></span></dt><dd><p>This defines the maximum size in kilobytes for
+            an archive member (zip, tar or rar at the moment). Bigger
+            entries will be skipped.</p></dd><dt><span class="term"><code class="varname">indexallfilenames</code></span></dt><dd><p><span class="application">Recoll</span> indexes file names in a special
+            section of the database to allow specific file names
+            searches using wild cards. This parameter decides if 
+            file name indexing is performed only for files with MIME
+            types that would qualify them for full text indexing, or
+            for all files inside the selected subtrees, independently of
+            MIME type.</p></dd><dt><span class="term"><code class="varname">usesystemfilecommand</code></span></dt><dd><p>Decide if we execute a system command 
+            (<span class="command"><strong>file</strong></span> <code class="option">-i</code> by default)
+            as a final step for determining the MIME type for a file
+            (the main procedure uses suffix associations as defined in
+            the <code class="filename">mimemap</code> file). This can be useful
+            for files with suffix-less names, but it will also cause
+            the indexing of many bogus "text" files.</p></dd><dt><span class="term"><code class="varname">systemfilecommand</code></span></dt><dd><p>Command to use for mime for mime type
+            determination if <code class="literal">usesystefilecommand</code> is
+            set. Recent versions of <span class="command"><strong>xdg-mime</strong></span> sometimes
+            work better than <span class="command"><strong>file</strong></span>.</p></dd><dt><span class="term"><code class="varname">processwebqueue</code></span></dt><dd><p>If this is set, process the directory where
+            Web browser plugins copy visited pages for indexing.</p></dd><dt><span class="term"><code class="varname">webqueuedir</code></span></dt><dd><p>The path to the web indexing queue. This is
+            hard-coded in the Firefox plugin as
+            <code class="filename">~/.recollweb/ToIndex</code> so there should be no
+            need to change it.</p></dd></dl></div></div><div class="sect3" title="5.4.1.2. Parameters affecting how we generate terms:"><div class="titlepage"><div><div><h4 class="title"><a name="RCL.INSTALL.CONFIG.RECOLLCONF.TERMS"></a>5.4.1.2. Parameters affecting how we generate terms:</h4></div></div></div><p>Changing some of these parameters will imply a full
+          reindex. Also, when using multiple indexes, it may not make sense
+          to search indexes that don't share the values for these parameters,
+          because they usually affect both search and index operations.</p><div class="variablelist"><dl><dt><span class="term"><code class="varname">indexStripChars</code></span></dt><dd><p>Decide if we strip characters of diacritics and
+                convert them to lower-case before terms are indexed. If we
+                don't, searches sensitive to case and diacritics can be
+                performed, but the index will be bigger, and some marginal
+                weirdness may sometimes occur. The default is a stripped
+                index (<code class="literal">indexStripChars = 1</code>) for
+                now. When using multiple indexes for a search,
+                this parameter must be defined identically for
+                all. Changing the value implies an index reset.</p></dd><dt><span class="term"><code class="varname">maxTermExpand</code></span></dt><dd><p>Maximum expansion count for a single term (e.g.:
+                when using wildcards). The default of 10000 is reasonable and
+                will avoid queries that appear frozen while the engine is
+                walking the term list.</p></dd><dt><span class="term"><code class="varname">maxXapianClauses</code></span></dt><dd><p>Maximum number of elementary clauses we can add
+                to a single Xapian query. In some cases, the result of term
+                expansion can be multiplicative, and we want to avoid using
+                excessive memory. The default of 100 000 should be both
+                high enough in most cases and compatible with current
+                typical hardware configurations.</p></dd><dt><span class="term"><code class="varname">nonumbers</code></span></dt><dd><p>If this set to true, no terms will be generated
+            for numbers. For example "123", "1.5e6", 192.168.1.4, would not
+            be indexed ("value123" would still be). Numbers are often quite
+            interesting to search for, and this should probably not be set
+            except for special situations, ie, scientific documents with huge
+            amounts of numbers in them. This can only be set for a whole
+            index, not for a subtree.</p></dd><dt><span class="term"><code class="varname">nocjk</code></span></dt><dd><p>If this set to true, specific east asian
+            (Chinese Korean Japanese) characters/word splitting is
+            turned off. This will save a small amount of cpu if you
+            have no CJK documents. If your document base does include
+            such text but you are not interested in searching it,
+            setting <code class="varname">nocjk</code> may be a significant time
+            and space saver.</p></dd><dt><span class="term"><code class="varname">cjkngramlen</code></span></dt><dd><p>This lets you adjust the size of n-grams
+            used for indexing CJK text. The default value of 2 is
+            probably appropriate in most cases. A value of 3 would
+            allow more precision and efficiency on longer words, but
+            the index will be approximately twice as large.</p></dd><dt><span class="term"><code class="varname">indexstemminglanguages</code></span></dt><dd><p>A list of languages for which the stem
+            expansion databases will be built. See <span class="citerefentry"><span class="refentrytitle">recollindex</span>(1)</span> or use the
+            <span class="command"><strong>recollindex</strong></span> <code class="option">-l</code> command
+            for possible values. You can add a stem expansion database
+            for a different language by using
+            <span class="command"><strong>recollindex</strong></span> <code class="option">-s</code>, but it
+            will be deleted during the next indexing. Only languages
+            listed in the configuration file are permanent.</p></dd><dt><span class="term"><code class="varname">defaultcharset</code></span></dt><dd><p>The name of the character set used for
+            files that do not contain a character set definition (ie:
+            plain text files). This can be redefined for any
+            sub-directory. If it is not set at all, the character set
+            used is the one defined by the nls environment (
+	    <code class="envar">LC_ALL</code>, <code class="envar">LC_CTYPE</code>, 
+	    <code class="envar">LANG</code>), or <code class="literal">iso8859-1</code> 
+	    if nothing is set.</p></dd><dt><span class="term"><code class="varname">unac_except_trans</code></span></dt><dd><p>This is a list of characters, encoded in UTF-8,
+            which should be handled specially when converting text to
+            unaccented lowercase.  For example, in Swedish, the letter
+            <code class="literal">a with diaeresis</code> has full alphabet
+            citizenship and should not be turned into an
+            <code class="literal">a</code>. Each element in the space-separated list
+            has the special character as first element and the translation
+            following. The handling of both the lowercase and upper-case
+            versions of a character should be specified, as appartenance to
+            the list will turn-off both standard accent and case
+            processing. Example for Swedish:</p><pre class="programlisting">
+unac_except_trans =  åå Åå ää Ää öö Öö
+            </pre><p>Note that the translation is not limited to a single
+            character, you could very well have something like
+            <code class="literal">üue</code> in the list.</p><p>The default value set for
+             <code class="literal">unac_except_trans</code> can't be listed here
+             because I have trouble with SGML and UTF-8, but it only
+             contains ligature decompositions: german ss, oe, ae, fi,
+             fl.</p><p>This parameter can't be defined for subdirectories, it
+             is global, because there is no way to do otherwise when
+             querying. If you have document sets which would need different
+             values, you will have to index and query them separately.</p></dd><dt><span class="term"><code class="varname">maildefcharset</code></span></dt><dd><p>This can be used to define the default
+		character set specifically for email messages which don't
+		specify it. This is mainly useful for readpst (libpst) dumps,
+		which are utf-8 but do not say so.</p></dd><dt><span class="term"><code class="varname">localfields</code></span></dt><dd><p>This allows setting fields for all documents
+            under a given directory. Typical usage would be to set an
+            "rclaptg" field, to be used in <code class="filename">mimeview</code> to
+            select a specific viewer. If several fields are to be set, they
+            should be separated with a semi-colon (';') character, which there
+            is currently no way to escape. Also note the initial semi-colon. 
+            Example:
+		<code class="literal">localfields= ;rclaptg=gnus;other = val</code>, then
+		select specifier viewer with
+		<code class="literal">mimetype|tag=...</code> in
+		<code class="filename">mimeview</code>.</p></dd><dt><span class="term"><code class="varname">testmodifusemtime</code></span></dt><dd><p>If true, use mtime instead of default ctime to
+              determine if a file has been modified (in addition to
+              size, which is always used). Setting this can reduce
+              re-indexing on systems where extended attributes are
+              modified (by some other application), but not indexed
+              (changing extended attributes only affects
+              ctime). Notes:
+              </p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>This may prevent detection of change
+                in some marginal file rename cases (the target would
+                need to have the same size and
+                mtime).</p></li><li class="listitem"><p>You should probably also set
+                noxattrfields to 1 in this case, except if you still
+                prefer to perform xattr indexing, for example if the
+                local file update pattern makes it of value (as in
+                general, there is a risk for pure extended attributes
+                updates without file modification to go
+                undetected).</p></li></ul></div><p>
+                Perform a full index reset after changing the value of
+                this parameter.
+            </p></dd><dt><span class="term"><code class="varname">noxattrfields</code></span></dt><dd><p>Recoll versions 1.19 and later
+                automatically translate file extended attributes into
+                document fields (to be processed according to the
+                parameters from the <code class="filename">fields</code>
+                file). Setting this variable to 1 will disable the
+                behaviour.</p></dd><dt><a name="RCL.INSTALL.CONFIG.RECOLLCONF.METADATACMDS"></a><span class="term"><code class="varname">metadatacmds</code></span></dt><dd><p>This allows executing external commands
+                for each file and storing the output in <span class="application">Recoll</span> document
+                fields. This could be used for example to index
+                external tag data. The value is a list of field names
+                and commands, don't forget an initial
+                semi-colon. Example:
+                </p><pre class="programlisting">
+[/some/area/of/the/fs]
+metadatacmds = ; tags = tmsu tags %f; otherfield = somecmd -xx %f
+                </pre><p>
+              </p><p>As a specially disgusting hack brought by
+                <span class="application">Recoll</span> 1.19.7, if a "field name" begins
+                with <code class="literal">rclmulti</code>, the data returned by
+                the command is expected to contain multiple field
+                values, in configuration file format. This allows
+                setting several fields by executing a single
+                command. Example:
+                </p><pre class="programlisting">
+metadatacmds = ; rclmulti1 = somecmd %f
+                </pre><p>
+                If <code class="literal">somecmd</code> returns data in the form
+                of:
+                </p><pre class="programlisting">
+field1 = value1
+field2 = value for field2
+                </pre><p>
+                <code class="literal">field1</code>
+                and <code class="literal">field2</code> will be set inside the
+                document metadata.</p></dd></dl></div></div><div class="sect3" title="5.4.1.3. Parameters affecting where and how we store things:"><div class="titlepage"><div><div><h4 class="title"><a name="RCL.INSTALL.CONFIG.RECOLLCONF.STORAGE"></a>5.4.1.3. Parameters affecting where and how we store things:</h4></div></div></div><div class="variablelist"><dl><dt><span class="term"><code class="varname">dbdir</code></span></dt><dd><p>The name of the Xapian data directory. It
+            will be created if needed when the index is
+            initialized. If this is not an absolute path, it will be
+            interpreted relative to the configuration directory. The
+            value can have embedded spaces but starting or trailing
+            spaces will be trimmed. You cannot use quotes here.</p></dd><dt><span class="term"><code class="varname">idxstatusfile</code></span></dt><dd><p>The name of the scratch file where the indexer
+                process updates its status. Default:
+            <code class="filename">idxstatus.txt</code> inside the configuration
+            directory.</p></dd><dt><span class="term"><code class="varname">maxfsoccuppc</code></span></dt><dd><p>Maximum file system occupation before we
+            stop indexing. The value is a percentage, corresponding to
+            what the "Capacity" df output column shows.  The default
+            value is 0, meaning no checking. </p></dd><dt><span class="term"><code class="varname">mboxcachedir</code></span></dt><dd><p>The directory where mbox message offsets cache
+	    files are held. This is normally $RECOLL_CONFDIR/mboxcache, but
+	    it may be useful to share a directory between different
+	    configurations.</p></dd><dt><span class="term"><code class="varname">mboxcacheminmbs</code></span></dt><dd><p>The minimum mbox file size over which we
+		cache the offsets. There is really no sense in caching
+		offsets for small files. The default is 5 MB.</p></dd><dt><span class="term"><code class="varname">webcachedir</code></span></dt><dd><p>This is only used by the web browser
+            plugin indexing code, and defines where the cache for visited
+            pages will live. Default:
+            <code class="filename">$RECOLL_CONFDIR/webcache</code></p></dd><dt><span class="term"><code class="varname">webcachemaxmbs</code></span></dt><dd><p>This is only used by the web browser
+            plugin indexing code, and defines the maximum size for the web
+            page cache. Default: 40 MB. Quite unfortunately, this is only
+            taken into account when creating the cache file. You need to
+            delete the file for a change to be taken into account.</p></dd><dt><span class="term"><code class="varname">idxflushmb</code></span></dt><dd><p>Threshold (megabytes of new text data) where we
+            flush from memory to disk index. Setting this can help control
+            memory usage. A value of 0 means no explicit flushing, letting
+            Xapian use its own default, which is flushing every 10000 (or
+            XAPIAN_FLUSH_THRESHOLD) documents, which gives little memory
+            usage control, as memory usage also depends on average document
+            size. The default value is 10, and it is probably a bit low. If
+            your system usually has free memory, you can try higher values
+            between 20 and 80. In my experience, values beyond 100 are
+            always counterproductive.</p></dd></dl></div></div><div class="sect3" title="5.4.1.4. Parameters affecting multithread processing"><div class="titlepage"><div><div><h4 class="title"><a name="RCL.INSTALL.CONFIG.RECOLLCONF.IDXTHREADS"></a>5.4.1.4. Parameters affecting multithread processing</h4></div></div></div><p>The <span class="application">Recoll</span> indexing process 
+          <span class="command"><strong>recollindex</strong></span> can use multiple threads to
+          speed up indexing on multiprocessor systems. The work done
+          to index files is divided in several stages and some of the
+          stages can be executed by multiple threads. The stages are:
+          </p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem">File system walking: this is always performed by
+              the main thread.</li><li class="listitem">File conversion and data extraction.</li><li class="listitem">Text processing (splitting, stemming,
+            etc.)</li><li class="listitem"><span class="application">Xapian</span> index update.</li></ol></div><p>
+        </p><p>You can also read a 
+          <a class="ulink" href="http://www.recoll.org/idxthreads/threadingRecoll.html" target="_top">
+            longer document</a> about the transformation of
+          <span class="application">Recoll</span> indexing to multithreading.</p><p>The threads configuration is controlled by two
+          configuration file parameters.</p><div class="variablelist"><dl><dt><span class="term"><code class="varname">thrQSizes</code></span></dt><dd><p>This variable defines the job input queues
+                configuration. There are three possible queues for
+                stages 2, 3 and 4, and this parameter should give the
+                queue depth for each stage (three integer values). If
+                a value of -1 is used for a given stage, no queue is
+                used, and the thread will go on performing the next
+                stage. In practise, deep queues have not been shown to
+                increase performance. A value of 0 for the first queue
+                tells <span class="application">Recoll</span> to perform autoconfiguration (no need for
+                the two other values in this case) - this is the
+                default configuration.</p></dd><dt><span class="term"><code class="varname">thrTCounts</code></span></dt><dd><p>This defines the number of threads used
+                for each stage. If a value of -1 is used for one of
+                the queue depths, the corresponding thread count is
+                ignored. It makes no sense to use a value other than 1
+                for the last stage because updating the <span class="application">Xapian</span> index is
+                necessarily single-threaded (and protected by a
+                mutex).</p></dd></dl></div><p>The following example would use three queues (of depth 2),
+         and 4 threads for converting source documents, 2 for
+         processing their text, and one to update the index. This was
+         tested to be the best configuration on the test system
+         (quadri-processor with multiple disks).
+</p><pre class="programlisting">
+thrQSizes = 2 2 2
+thrTCounts =  4 2 1
+</pre><p>
+         </p><p>The following example would use a single queue, and the
+           complete processing for each document would be performed by
+           a single thread (several documents will still be processed
+           in parallel in most cases). The threads will use mutual
+           exclusion when entering the index update stage. In practise
+           the performance would be close to the precedent case in
+           general, but worse in certain cases (e.g. a Zip archive
+           would be performed purely sequentially), so the previous
+           approach is preferred. YMMV...  The 2 last values for
+           thrTCounts are ignored.
+</p><pre class="programlisting">
+thrQSizes = 2 -1 -1
+thrTCounts =  6 1 1
+</pre><p>
+         </p><p>The following example would disable
+           multithreading. Indexing will be performed by a single
+           thread.
+</p><pre class="programlisting">
+thrQSizes = -1 -1 -1
+</pre><p>
+         </p></div><div class="sect3" title="5.4.1.5. Miscellaneous parameters:"><div class="titlepage"><div><div><h4 class="title"><a name="RCL.INSTALL.CONFIG.RECOLLCONF.MISC"></a>5.4.1.5. Miscellaneous parameters:</h4></div></div></div><div class="variablelist"><dl><dt><span class="term"><code class="varname">autodiacsens</code></span></dt><dd><p>IF the index is not stripped, decide if we
+                automatically trigger diacritics sensitivity if the search
+                term has accented characters (not in
+                <code class="literal">unac_except_trans</code>). Else you need to use
+                the query language and the <code class="literal">D</code> modifier to
+                specify diacritics sensitivity. Default is no.</p></dd><dt><span class="term"><code class="varname">autocasesens</code></span></dt><dd><p>IF the index is not stripped, decide if we
+                automatically trigger character case sensitivity if the
+                search term has upper-case characters in any but the first
+                position. Else you need to use the query language and the
+                <code class="literal">C</code> modifier to specify character-case
+                sensitivity. Default is yes.</p></dd><dt><span class="term"><code class="varname">loglevel,daemloglevel</code></span></dt><dd><p>Verbosity level for recoll and
+            recollindex. A value of 4 lists quite a lot of
+            debug/information messages. 2 only lists errors. The
+            <code class="literal">daem</code>version is specific to the indexing monitor
+            daemon.</p></dd><dt><span class="term"><code class="varname">logfilename,
+		daemlogfilename</code></span></dt><dd><p>Where the messages should go. 'stderr' can
+            be used as a special value, and is the default. The
+            <code class="literal">daem</code>version is specific to the indexing monitor
+            daemon.</p></dd><dt><span class="term"><code class="varname">mondelaypatterns</code></span></dt><dd><p>This allows specify wildcard path patterns
+            (processed with fnmatch(3) with 0 flag), to match files which
+            change too often and for which a delay should be observed before
+            re-indexing. This is a space-separated list, each entry being a
+            pattern and a time in seconds, separated by a colon. You can
+            use double quotes if a path entry contains white
+            space. Example:</p><pre class="programlisting">
+mondelaypatterns = *.log:20 "this one has spaces*:10"
+              </pre></dd><dt><span class="term"><code class="varname">monixinterval</code></span></dt><dd><p>Minimum interval (seconds) for processing the
+            indexing queue. The real time monitor does not process each
+            event when it comes in, but will wait this time for the queue
+            to accumulate to diminish overhead and in order to aggregate
+            multiple events to the same file. Default 30 S.</p></dd><dt><span class="term"><code class="varname">monauxinterval</code></span></dt><dd><p>Period (in seconds) at which the real time
+            monitor will regenerate the auxiliary databases (spelling,
+            stemming) if needed. The default is one hour.</p></dd><dt><span class="term"><code class="varname">monioniceclass, monioniceclassdata
+             </code></span></dt><dd><p>These allow defining the
+             <span class="application">ionice</span> class and data used by the
+             indexer (default class 3, no data).</p></dd><dt><span class="term"><code class="varname">filtermaxseconds</code></span></dt><dd><p>Maximum handler execution time, after which it
+            is aborted. Some postscript programs just loop...</p></dd><dt><span class="term"><code class="varname">filtersdir</code></span></dt><dd><p>A directory to search for the external
+            input handler scripts used to index some types of files. The
+            value should not be changed, except if you want to modify
+            one of the default scripts. The value can be redefined for
+            any sub-directory. </p></dd><dt><span class="term"><code class="varname">iconsdir</code></span></dt><dd><p>The name of the directory where
+            <span class="command"><strong>recoll</strong></span> result list icons are
+            stored. You can change this if you want different
+            images.</p></dd><dt><span class="term"><code class="varname">idxabsmlen</code></span></dt><dd><p><span class="application">Recoll</span> stores an abstract for each indexed
+            file inside the database. The text can come from an actual
+            'abstract' section in the document or will just be the
+            beginning of the document. It is stored in the index so
+            that it can be displayed inside the result lists without
+            decoding the original
+            file. The <code class="varname">idxabsmlen</code> parameter defines
+            the size of the stored abstract. The default value is 250 bytes.
+            The search interface gives you the choice to display this
+            stored text or a synthetic abstract built by extracting
+            text around the search terms. If you always
+            prefer the synthetic abstract, you can reduce this value
+            and save a little space.
+            </p></dd><dt><span class="term"><code class="varname">idxmetastoredlen</code></span></dt><dd><p>Maximum stored length for metadata
+                fields. This does not affect indexing (the whole field is
+                processed anyway), just the amount of data stored in the
+                index for the purpose of displaying fields inside result
+                lists or previews. The default value is 150 bytes which
+                may be too low if you have custom fields.</p></dd><dt><span class="term"><code class="varname">aspellLanguage</code></span></dt><dd><p>Language definitions to use when creating
+            the aspell dictionary.  The value must match a set of
+            aspell language definition files. You can type "aspell
+            config" to see where these are installed (look for
+            data-dir). The default if the variable is not set is to
+            use your desktop national language environment to guess
+            the value.</p></dd><dt><span class="term"><code class="varname">noaspell</code></span></dt><dd><p>If this is set, the aspell dictionary
+            generation is turned off. Useful for cases where you don't
+            need the functionality or when it is unusable because
+            aspell crashes during dictionary generation.</p></dd><dt><span class="term"><code class="varname">mhmboxquirks</code></span></dt><dd><p>This allows definining location-related quirks
+            for the mailbox handler. Currently only the
+            <code class="literal">tbird</code> flag is defined, and it should be set
+            for directories which hold
+            <span class="application">Thunderbird</span> data, as their folder
+            format is weird.</p></dd></dl></div></div></div><div class="sect2" title="5.4.2. The fields file"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.INSTALL.CONFIG.FIELDS"></a>5.4.2. The fields file</h3></div></div></div><p>This file contains information about dynamic fields handling
+	in <span class="application">Recoll</span>. Some very basic fields have hard-wired behaviour,
+	and, mostly, you should not change the original data inside the
+	<code class="filename">fields</code> file. But you can create custom fields
+	fitting your data and handle them just like they were native
+	ones.</p><p>The <code class="filename">fields</code> file has several sections,
+	which each define an aspect of fields processing. Quite often,
+	you'll have to modify several sections to obtain the desired
+	behaviour.</p><p>We will only give a short description here, you should refer
+	to the comments inside the default file for more detailed
+	information.</p><p>Field names should be lowercase alphabetic ASCII.</p><div class="variablelist"><dl><dt><span class="term">[prefixes]</span></dt><dd><p>A field becomes indexed (searchable) by having
+            a prefix defined in this section.</p></dd><dt><span class="term">[stored]</span></dt><dd><p>A field becomes stored (displayable inside
+            results) by having its name listed in this section (typically
+            with an empty value).</p></dd><dt><span class="term">[aliases]</span></dt><dd><p>This section defines lists of synonyms for the
+            canonical names used inside the <code class="literal">[prefixes]</code>
+            and <code class="literal">[stored]</code> sections</p></dd><dt><span class="term">[queryaliases]</span></dt><dd><p>This section also defines aliases for the
+            canonic field names, with the difference that the substitution
+            will only be used at query time, avoiding any possibility that
+            the value would pick-up random metadata from documents.</p></dd><dt><span class="term">handler-specific sections</span></dt><dd><p>Some input handlers may need specific
+            configuration for handling fields. Only the email message handler
+            currently has such a section (named
+            <code class="literal">[mail]</code>). It allows indexing arbitrary email
+            headers in addition to the ones indexed by default. Other such
+            sections may appear in the future.</p></dd></dl></div><p>Here follows a small example of a personal
+      <code class="filename">fields</code> 
+      file. This would extract a specific email header and
+      use it as a searchable field, with data displayable inside result
+      lists. (Side note: as the email handler does no decoding on the values,
+      only plain ascii headers can be indexed, and only the
+      first occurrence will be used for headers that occur several times).
+
+</p><pre class="programlisting">[prefixes]
+# Index mailmytag contents (with the given prefix)
+mailmytag = XMTAG
+
+[stored]
+# Store mailmytag inside the document data record (so that it can be
+# displayed - as %(mailmytag) - in result lists).
+mailmytag = 
+
+[queryaliases]
+filename = fn
+containerfilename = cfn
+
+[mail]
+# Extract the X-My-Tag mail header, and use it internally with the
+# mailmytag field name
+x-my-tag = mailmytag
+</pre><p>
+</p><div class="sect3" title="5.4.2.1. Extended attributes in the fields file"><div class="titlepage"><div><div><h4 class="title"><a name="RCL.INSTALL.CONFIG.FIELDS.XATTR"></a>5.4.2.1. Extended attributes in the fields file</h4></div></div></div><p><span class="application">Recoll</span> versions 1.19 and later process user extended
+        file attributes as documents fields by default.</p><p>Attributes are processed as fields of the same name,
+          after removing the <code class="literal">user</code> prefix on
+          Linux.</p><p>The <code class="literal">[xattrtofields]</code>
+          section of the <code class="filename">fields</code> file allows
+          specifying translations from extended attributes names to
+          <span class="application">Recoll</span> field names. An empty translation disables use of the
+          corresponding attribute data.</p></div></div><div class="sect2" title="5.4.3. The mimemap file"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.INSTALL.CONFIG.MIMEMAP"></a>5.4.3. The mimemap file</h3></div></div></div><p><code class="filename">mimemap</code> specifies the
+        file name extension to MIME type mappings.</p><p>For file names without an extension, or with an unknown
+        one, the system's <span class="command"><strong>file</strong></span> <code class="option">-i</code> 
+	command will be
+        executed to determine the MIME type (this can be switched off
+        inside the main configuration file).</p><p>The mappings can be specified on a per-subtree basis,
+        which may be useful in some cases. Example:
+        <span class="application">gaim</span> logs have a
+        <code class="filename">.txt</code> extension but 
+        should be handled specially, which is possible because they
+        are usually all located in one place.</p><p><code class="filename">mimemap</code> also has a
+        <code class="varname">recoll_noindex</code> variable which is a list of
+        suffixes. Matching files will be skipped (which avoids
+        unnecessary decompressions or <span class="command"><strong>file</strong></span>
+        executions). This is partially redundant with
+        <code class="varname">skippedNames</code> in the main configuration
+        file, with a few differences: it will not affect directories,
+        it cannot be made dependant on the file-system location (it is
+        a configuration-wide parameter), and the file names will still
+        be indexed (not even the file names are indexed for patterns
+        in <code class="varname">skippedNames</code>.
+        <code class="varname">recoll_noindex</code> is used mostly for things
+        known to be unindexable by a given <span class="application">Recoll</span> version. Having it
+        there avoids cluttering the more user-oriented and locally
+        customized <code class="varname">skippedNames</code>.</p></div><div class="sect2" title="5.4.4. The mimeconf file"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.INSTALL.CONFIG.MIMECONF"></a>5.4.4. The mimeconf file</h3></div></div></div><p><code class="filename">mimeconf</code> specifies how the
+         different MIME types are handled for indexing, and which icons
+         are displayed in the <span class="command"><strong>recoll</strong></span> result lists.</p><p>Changing the parameters in the [index] section is
+         probably not a good idea except if you are a <span class="application">Recoll</span>
+         developer.</p><p>The [icons] section allows you to change the icons which
+         are displayed by <span class="command"><strong>recoll</strong></span> in the result
+         lists (the values are the basenames of the png images inside
+         the <code class="filename">iconsdir</code> directory (specified in
+         <code class="filename">recoll.conf</code>).</p></div><div class="sect2" title="5.4.5. The mimeview file"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.INSTALL.CONFIG.MIMEVIEW"></a>5.4.5. The mimeview file</h3></div></div></div><p><code class="filename">mimeview</code> specifies which programs
+          are started when you click on an <span class="guilabel">Open</span> link
+          in a result list. Ie: HTML is normally displayed using
+         <span class="application">firefox</span>, but you may prefer
+         <span class="application">Konqueror</span>, your
+         <span class="application">openoffice.org</span> 
+         program might be named <span class="command"><strong>oofice</strong></span> instead of
+         <span class="command"><strong>openoffice</strong></span> etc.</p><p>Changes to this file can be done by direct editing, or
+        through the <span class="command"><strong>recoll</strong></span> GUI preferences dialog.</p><p>If <span class="guilabel">Use desktop preferences to choose document
+        editor</span> is checked in the <span class="application">Recoll</span> GUI preferences, all
+        <code class="filename">mimeview</code> entries will be ignored except the
+        one labelled <code class="literal">application/x-all</code> (which is set to
+        use <span class="command"><strong>xdg-open</strong></span> by default).</p><p>In this case, the <code class="literal">xallexcepts</code> top level
+          variable defines a list of MIME type exceptions which
+          will be processed according to the local entries instead of being
+          passed to the desktop. This is so that specific <span class="application">Recoll</span> options
+          such as a page number or a search string can be passed to
+          applications that support them, such as the
+          <span class="application">evince</span> viewer.</p><p>As for the other configuration files, the normal usage
+          is to have a <code class="filename">mimeview</code> inside your own
+          configuration directory, with just the non-default entries,
+          which will override those from the central configuration
+          file.</p><p>All viewer definition entries must be placed under a
+          <code class="literal">[view]</code> section.</p><p>The keys in the file are normally MIME types. You can add an
+	  application tag to specialize the choice for an area of the
+	  filesystem (using a <code class="varname">localfields</code> specification
+	  in <code class="filename">mimeconf</code>). The syntax for the key is 
+<em class="replaceable"><code>mimetype</code></em><code class="literal">|</code><em class="replaceable"><code>tag</code></em></p><p>The <code class="varname">nouncompforviewmts</code> entry, (placed at
+        the top level, outside of the <code class="literal">[view]</code> section),
+        holds a list of MIME types that should not be uncompressed before
+        starting the viewer (if they are found compressed, ie:
+        <em class="replaceable"><code>mydoc.doc.gz</code></em>).</p><p>The right side of each assignment holds a command to be
+        executed for opening the file. The following substitutions are
+        performed:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p title="%D"><b>%D. </b>Document date</p></li><li class="listitem"><p title="%f"><b>%f. </b>File name. This may be the name of a temporary file if
+              it was  necessary to create one (ie: to extract a subdocument
+              from a  container).</p></li><li class="listitem"><p title="%i"><b>%i. </b>Internal path, for subdocuments of containers. The
+              format depends on the container type. If this appears in the
+              command line, <span class="application">Recoll</span> will not create a temporary file to
+              extract the subdocument, expecting the called application
+              (possibly a script) to be able to handle it.</p></li><li class="listitem"><p title="%M"><b>%M. </b>MIME type</p></li><li class="listitem"><p title="%p"><b>%p. </b>Page index. Only significant for a subset of document
+              types, currently only PDF, Postscript and DVI files. Can be
+              used to start the editor at the right page for a match or
+              snippet.</p></li><li class="listitem"><p title="%s"><b>%s. </b>Search term. The value will only be set for documents
+              with indexed page numbers (ie: PDF). The value will be one of
+              the matched search terms. It would allow pre-setting the
+              value in the "Find" entry inside Evince for example, for easy
+              highlighting of the term.</p></li><li class="listitem"><p title="%u"><b>%u. </b>Url.</p></li></ul></div><p>In addition to the predefined values above, all strings like
+        <code class="literal">%(fieldname)</code> will be replaced by the value of
+        the field named <code class="literal">fieldname</code> for the
+        document. This could be used in combination with field
+        customisation to help with opening the document.</p></div><div class="sect2" title="5.4.6. The ptrans file"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.INSTALL.CONFIG.PTRANS"></a>5.4.6. The <code class="filename">ptrans</code> file</h3></div></div></div><p><code class="filename">ptrans</code> specifies query-time path
+          translations. These can be useful
+          in <a class="link" href="RCL.SEARCH.PTRANS.html" title="3.4. Path translations">multiple
+          cases</a>.</p><p>The file has a section for any index which needs
+          translations, either the main one or additional query
+          indexes. The sections are named with the <span class="application">Xapian</span> index
+          directory names. No slash character should exist at the end
+          of the paths (all comparisons are textual). An exemple
+          should make things sufficiently clear</p><pre class="programlisting">
+          [/home/me/.recoll/xapiandb]
+          /this/directory/moved = /to/this/place
+
+          [/path/to/additional/xapiandb]
+          /server/volume1/docdir = /net/server/volume1/docdir
+          /server/volume2/docdir = /net/server/volume2/docdir
+        </pre></div><div class="sect2" title="5.4.7. Examples of configuration adjustments"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.INSTALL.CONFIG.EXAMPLES"></a>5.4.7. Examples of configuration adjustments</h3></div></div></div><div class="sect3" title="5.4.7.1. Adding an external viewer for an non-indexed type"><div class="titlepage"><div><div><h4 class="title"><a name="RCL.INSTALL.CONFIG.EXAMPLES.ADDVIEW"></a>5.4.7.1. Adding an external viewer for an non-indexed type</h4></div></div></div><p>Imagine that you have some kind of file which does not
+            have indexable content, but for which you would like to have a
+            functional <span class="guilabel">Open</span> link in the result list
+            (when found by file name). The file names end in
+            <em class="replaceable"><code>.blob</code></em> and can be displayed by
+            application <em class="replaceable"><code>blobviewer</code></em>.</p><p>You need two entries in the configuration files for this
+	    to work:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>In <code class="filename">$RECOLL_CONFDIR/mimemap</code>
+		(typically <code class="filename">~/.recoll/mimemap</code>), add the
+		following line:</p><pre class="programlisting">
+.blob = application/x-blobapp
+</pre><p>
+		Note that the MIME type is made up here, and you could
+		call it <em class="replaceable"><code>diesel/oil</code></em> just the
+		same.</p></li><li class="listitem"><p>In <code class="filename">$RECOLL_CONFDIR/mimeview</code>
+		under the <code class="literal">[view]</code> section, add:</p><pre class="programlisting">
+application/x-blobapp = blobviewer %f
+</pre><p>We are supposing
+              that <em class="replaceable"><code>blobviewer</code></em> wants a file
+              name parameter here, you would use <code class="literal">%u</code> if
+              it liked URLs better.</p></li></ul></div><p>If you just wanted to change the application used by
+            <span class="application">Recoll</span> to display a MIME type which it already knows, you
+            would just need to edit <code class="filename">mimeview</code>. The
+            entries you add in your personal file override those in the
+            central configuration, which you do not need to
+            alter. <code class="filename">mimeview</code> can also be modified
+            from the Gui.</p></div><div class="sect3" title="5.4.7.2. Adding indexing support for a new file type"><div class="titlepage"><div><div><h4 class="title"><a name="RCL.INSTALL.CONFIG.EXAMPLES.ADDINDEX"></a>5.4.7.2. Adding indexing support for a new file type</h4></div></div></div><p>Let us now imagine that the above
+            <em class="replaceable"><code>.blob</code></em> files actually contain
+            indexable text and that you know how to extract it with a
+            command line program. Getting <span class="application">Recoll</span> to index the files is
+            easy. You need to perform the above alteration, and also to
+            add data to the <code class="filename">mimeconf</code> file
+            (typically in <code class="filename">~/.recoll/mimeconf</code>):</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>Under the <code class="literal">[index]</code>
+		section, add the following line (more about the
+		<em class="replaceable"><code>rclblob</code></em> indexing script
+		later):</p><pre class="programlisting">
+application/x-blobapp = exec rclblob
+</pre></li><li class="listitem"><p>Under the <code class="literal">[icons]</code>
+		section, you should choose an icon to be displayed for the
+		files inside the result lists. Icons are normally 64x64
+		pixels PNG files which live in
+		<code class="filename">/usr/[local/]share/recoll/images</code>.</p></li><li class="listitem"><p>Under the <code class="literal">[categories]</code>
+		section, you should add the MIME type where it makes sense
+		(you can also create a category). Categories may be used
+		for filtering in advanced search.</p></li></ul></div><p>The <em class="replaceable"><code>rclblob</code></em> handler should
+            be an executable program or script which exists inside
+            <code class="filename">/usr/[local/]share/recoll/filters</code>. It
+            will be given a file name as argument and should output the
+            text or html contents on the standard output.</p><p>The <a class="link" href="RCL.PROGRAM.html#RCL.PROGRAM.FILTERS" title="4.1. Writing a document input handler">filter
+              programming</a> section describes in more detail how
+              to write an input handler.</p></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="RCL.INSTALL.BUILDING.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="RCL.INSTALL.html">Up</a></td><td width="40%" align="right"> </td></tr><tr><td width="40%" align="left" valign="top">5.3. Building from source </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> </td></tr></table></div></body></html>

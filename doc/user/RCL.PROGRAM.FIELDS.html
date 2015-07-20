@@ -1,0 +1,45 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>4.2. Field data processing</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="Recoll user manual"><link rel="up" href="RCL.PROGRAM.html" title="Chapter 4. Programming interface"><link rel="prev" href="RCL.PROGRAM.html" title="Chapter 4. Programming interface"><link rel="next" href="RCL.PROGRAM.API.html" title="4.3. API"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">4.2. Field data processing</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="RCL.PROGRAM.html">Prev</a> </td><th width="60%" align="center">Chapter 4. Programming interface</th><td width="20%" align="right"> <a accesskey="n" href="RCL.PROGRAM.API.html">Next</a></td></tr></table><hr></div><div class="sect1" title="4.2. Field data processing"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="RCL.PROGRAM.FIELDS"></a>4.2. Field data processing</h2></div></div></div><p><code class="literal">Fields</code> are named pieces of information
+      in or about documents, like <code class="literal">title</code>,
+      <code class="literal">author</code>, <code class="literal">abstract</code>.</p><p>The field values for documents can appear in several ways
+      during indexing: either output by input handlers
+      as <code class="literal">meta</code> fields in the HTML header section, or
+      extracted from file extended attributes, or added as attributes
+      of the <code class="literal">Doc</code> object when using the API, or
+      again synthetized internally by <span class="application">Recoll</span>.</p><p>The <span class="application">Recoll</span> query language allows searching for text in a
+      specific field.</p><p><span class="application">Recoll</span> defines a number of default fields. Additional
+      ones can be output by handlers, and described in the
+      <code class="filename">fields</code> configuration file.</p><p>Fields can be:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p><code class="literal">indexed</code>, meaning that their
+        terms are separately stored in inverted lists (with a specific
+        prefix), and that a field-specific search is possible.</p></li><li class="listitem"><p><code class="literal">stored</code>, meaning that their
+        value is recorded in the index data record for the document,
+        and can be returned and displayed with search results.</p></li></ul></div><p>A field can be either or both indexed and stored. This and 
+      other aspects of fields handling is defined inside the
+      <code class="filename">fields</code> configuration file.</p><p>The sequence of events for field processing is as follows:
+       </p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>During indexing, 
+          <span class="command"><strong>recollindex</strong></span> scans all <code class="literal">meta</code>
+          fields in HTML documents (most document types are transformed
+          into HTML at some point). It compares the name for each element
+          to the configuration defining what should be done with fields
+          (the <code class="filename">fields</code> file)</p></li><li class="listitem"><p>If the name for the <code class="literal">meta</code>
+          element matches one for a field that should be indexed, the
+          contents are processed and the terms are entered into the index
+          with the prefix defined in the <code class="filename">fields</code>
+          file.</p></li><li class="listitem"><p>If the name for the <code class="literal">meta</code> element
+          matches one for a field that should be stored, the content of the
+          element is stored with the document data record, from which it
+          can be extracted and displayed at query time.</p></li><li class="listitem"><p>At query time, if a field search is performed, the
+          index prefix is computed and the match is only performed against
+          appropriately prefixed terms in the index.</p></li><li class="listitem"><p>At query time, the field can be displayed inside
+          the result list by using the appropriate directive in the
+          definition of the <a class="link" href="RCL.SEARCH.html#RCL.SEARCH.GUI.CUSTOM.RESLIST" title="3.1.14.1. The result list format">result list paragraph
+          format</a>. All fields are displayed on the fields screen of
+          the preview window (which you can reach through the right-click
+          menu). This is independant of the fact that the search which
+          produced the results used the field or not.</p></li></ul></div><p>
+      </p><p>You can find more information in the 
+      <a class="link" href="RCL.INSTALL.CONFIG.html#RCL.INSTALL.CONFIG.FIELDS" title="5.4.2. The fields file">section about the
+      <code class="filename">fields</code> file</a>, or in comments inside the
+      file.</p><p>You can also have a look at the 
+       <a class="ulink" href="http://bitbucket.org/medoc/recoll/wiki/HandleCustomField" target="_top">example on the Wiki</a>, 
+      detailing how one could add a <span class="emphasis"><em>page count</em></span> field
+      to pdf documents for displaying inside result lists.</p></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="RCL.PROGRAM.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="RCL.PROGRAM.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="RCL.PROGRAM.API.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter 4. Programming interface </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 4.3. API</td></tr></table></div></body></html>

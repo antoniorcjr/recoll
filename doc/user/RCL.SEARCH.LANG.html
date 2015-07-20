@@ -1,0 +1,203 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>3.5. The query language</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="Recoll user manual"><link rel="up" href="RCL.SEARCH.html" title="Chapter 3. Searching"><link rel="prev" href="RCL.SEARCH.PTRANS.html" title="3.4. Path translations"><link rel="next" href="RCL.SEARCH.CASEDIAC.html" title="3.6. Search case and diacritics sensitivity"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">3.5. The query language</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="RCL.SEARCH.PTRANS.html">Prev</a> </td><th width="60%" align="center">Chapter 3. Searching</th><td width="20%" align="right"> <a accesskey="n" href="RCL.SEARCH.CASEDIAC.html">Next</a></td></tr></table><hr></div><div class="sect1" title="3.5. The query language"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="RCL.SEARCH.LANG"></a>3.5. The query language</h2></div></div></div><p>The query language processor is activated in the GUI
+      simple search entry when the search mode selector is set to
+      <span class="guilabel">Query Language</span>. It can also be used with the KIO
+      slave or the command line search. It broadly has the same
+      capabilities as the complex search interface in the
+      GUI.</p><p>The language is based on the (seemingly defunct) 
+        <a class="ulink" href="http://www.xesam.org/main/XesamUserSearchLanguage95" target="_top">
+          Xesam</a> user search language specification.</p><p>If the results of a query language search puzzle you and you
+        doubt what has been actually searched for, you can use the GUI
+        <code class="literal">Show Query</code> link at the top of the result list to
+        check the exact query which was finally executed by Xapian.</p><p>Here follows a sample request that we are going to
+        explain:</p><pre class="programlisting">
+          author:"john doe" Beatles OR Lennon Live OR Unplugged -potatoes
+      </pre><p>This would search for all documents with 
+      <em class="replaceable"><code>John Doe</code></em>
+      appearing as a phrase in the author field (exactly what this is
+      would depend on the document type, ie: the
+      <code class="literal">From:</code> header, for an email message),
+      and containing either <em class="replaceable"><code>beatles</code></em> or
+      <em class="replaceable"><code>lennon</code></em> and either
+      <em class="replaceable"><code>live</code></em> or
+      <em class="replaceable"><code>unplugged</code></em> but not
+      <em class="replaceable"><code>potatoes</code></em> (in any part of the document).</p><p>An element is composed of an optional field specification,
+      and a value, separated by a colon (the field separator is the last
+      colon in the element). Example:
+      <em class="replaceable"><code>Eugenie</code></em>,
+      <em class="replaceable"><code>author:balzac</code></em>,
+      <em class="replaceable"><code>dc:title:grandet</code></em> </p><p>The colon, if present, means "contains". Xesam defines other
+      relations, which are mostly unsupported for now (except in special
+      cases, described further down).</p><p>All elements in the search entry are normally combined
+      with an implicit AND. It is possible to specify that elements be
+      OR'ed instead, as in <em class="replaceable"><code>Beatles</code></em>
+      <code class="literal">OR</code> <em class="replaceable"><code>Lennon</code></em>. The
+      <code class="literal">OR</code> must be entered literally (capitals), and
+      it has priority over the AND associations:
+      <em class="replaceable"><code>word1</code></em>
+      <em class="replaceable"><code>word2</code></em> <code class="literal">OR</code>
+      <em class="replaceable"><code>word3</code></em> 
+      means 
+      <em class="replaceable"><code>word1</code></em> AND 
+      (<em class="replaceable"><code>word2</code></em> <code class="literal">OR</code>
+      <em class="replaceable"><code>word3</code></em>)
+      not 
+      (<em class="replaceable"><code>word1</code></em> AND
+      <em class="replaceable"><code>word2</code></em>) <code class="literal">OR</code>
+      <em class="replaceable"><code>word3</code></em>. Explicit
+      parenthesis are <span class="emphasis"><em>not</em></span> supported.</p><p>An element preceded by a <code class="literal">-</code> specifies a
+      term that should <span class="emphasis"><em>not</em></span> appear. Pure negative
+      queries are forbidden.</p><p>As usual, words inside quotes define a phrase
+      (the order of words is significant), so that
+      <em class="replaceable"><code>title:"prejudice pride"</code></em> is not the same as
+      <em class="replaceable"><code>title:prejudice title:pride</code></em>, and is
+      unlikely to find a result.</p><p>To save you some typing, recent <span class="application">Recoll</span> versions (1.20 and later)
+      interpret a comma-separated list of terms as an AND list inside the
+      field. Use slash characters ('/') for an OR list. No white space
+      is allowed. So
+      </p><pre class="programlisting">author:john,lennon</pre><p> will search for
+      documents with <code class="literal">john</code> and <code class="literal">lennon</code>
+      inside the <code class="literal">author</code> field (in any order), and
+      </p><pre class="programlisting">author:john/ringo</pre><p> would search for
+      <code class="literal">john</code> or <code class="literal">ringo</code>.</p><p>Modifiers can be set on a phrase clause, for example to specify
+        a proximity search (unordered). See 
+        <a class="link" href="RCL.SEARCH.LANG.html#RCL.SEARCH.LANG.MODIFIERS" title="3.5.1. Modifiers">the modifier
+          section</a>.</p><p><span class="application">Recoll</span> currently manages the following default fields:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p><code class="literal">title</code>,
+            <code class="literal">subject</code> or <code class="literal">caption</code> are
+            synonyms which specify data to be searched for in the
+            document title or subject.</p></li><li class="listitem"><p><code class="literal">author</code> or
+            <code class="literal">from</code> for searching the documents
+            originators.</p></li><li class="listitem"><p><code class="literal">recipient</code> or
+            <code class="literal">to</code> for searching the documents
+            recipients.</p></li><li class="listitem"><p><code class="literal">keyword</code> for searching the
+            document-specified keywords (few documents actually have
+            any).</p></li><li class="listitem"><p><code class="literal">filename</code> for the document's
+            file name. This is not necessarily set for all documents:
+           internal documents contained inside a compound one (for example
+           an EPUB section) do not inherit the container file name any more,
+           this was replaced by an explicit field (see next). Sub-documents
+           can still have a specific <code class="literal">filename</code>, if it is
+           implied by the document format, for example the attachment file
+           name for an email attachment.</p></li><li class="listitem"><p><code class="literal">containerfilename</code>. This is
+           set for all documents, both top-level and contained
+           sub-documents, and is always the name of the filesystem directory
+           entry which contains the data. The terms from this field can
+           only be matched by an explicit field specification (as opposed
+           to terms from <code class="literal">filename</code> which are also indexed
+           as general document content). This avoids getting matches for
+           all the sub-documents when searching for the container file
+           name.</p></li><li class="listitem"><p><code class="literal">ext</code> specifies the file
+            name extension (Ex: <code class="literal">ext:html</code>)</p></li></ul></div><p><span class="application">Recoll</span> 1.20 and later have a way to specify aliases for the
+      field names, which will save typing, for example by aliasing
+      <code class="literal">filename</code> to <em class="replaceable"><code>fn</code></em> or
+      <code class="literal">containerfilename</code> to
+      <em class="replaceable"><code>cfn</code></em>. See the <a class="link" href="RCL.INSTALL.CONFIG.html#RCL.INSTALL.CONFIG.FIELDS" title="5.4.2. The fields file">section about the
+      <code class="filename">fields</code> file</a></p><p>The field syntax also supports a few field-like, but
+        special, criteria:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p><code class="literal">dir</code> for filtering the
+            results on file location
+            (Ex: <code class="literal">dir:/home/me/somedir</code>).  <code class="literal">-dir</code>
+            also works to find results not in the specified directory
+            (release &gt;= 1.15.8). Tilde expansion will be performed as
+            usual (except for a bug in versions 1.19 to
+            1.19.11p1). Wildcards will be expanded, but
+            please <a class="link" href="RCL.SEARCH.ANCHORWILD.html#RCL.SEARCH.WILDCARDS.PATH" title="3.7.1.1. Wildcards and path filtering"> have a
+            look</a> at an important limitation of wildcards in
+            path filters.</p><p>Relative paths also make sense, for example, 
+            <code class="literal">dir:share/doc</code> would match either
+            <code class="filename">/usr/share/doc</code> or
+            <code class="filename">/usr/local/share/doc</code> </p><p>Several <code class="literal">dir</code> clauses can be specified,
+          both positive and negative. For example the following makes sense:
+            </p><pre class="programlisting">
+dir:recoll dir:src -dir:utils -dir:common
+            </pre><p> This would select results which have both
+            <code class="filename">recoll</code> and <code class="filename">src</code> in the
+            path (in any order), and which have not either
+            <code class="filename">utils</code> or
+            <code class="filename">common</code>.</p><p>You can also use <code class="literal">OR</code> conjunctions
+            with <code class="literal">dir:</code> clauses.</p><p>A special aspect of <code class="literal">dir</code> clauses is
+            that the values in the index are not transcoded to UTF-8, and
+            never lower-cased or unaccented, but stored as binary. This means
+            that you need to enter the values in the exact lower or upper
+            case, and that searches for names with diacritics may sometimes
+            be impossible because of character set conversion
+            issues. Non-ASCII UNIX file paths are an unending source of
+            trouble and are best avoided.</p><p>You need to use double-quotes around the path value if it
+            contains space characters.</p></li><li class="listitem"><p><code class="literal">size</code> for filtering the
+            results on file size. Example: 
+            <code class="literal">size&lt;10000</code>. You can use
+            <code class="literal">&lt;</code>, <code class="literal">&gt;</code> or
+            <code class="literal">=</code> as operators. You can specify a range like the
+            following: <code class="literal">size&gt;100 size&lt;1000</code>. The usual
+            <code class="literal">k/K, m/M, g/G, t/T</code> can be used as (decimal)
+            multipliers. Ex: <code class="literal">size&gt;1k</code> to search for files
+            bigger than 1000 bytes.</p></li><li class="listitem"><p><code class="literal">date</code> for searching or filtering
+            on dates. The syntax for the argument is based on the ISO8601
+            standard for dates and time intervals. Only dates are supported, no
+            times. The general syntax is 2 elements separated by a
+            <code class="literal">/</code> character. Each element can be a date or a
+            period of time. Periods are specified as 
+            <code class="literal">P</code><em class="replaceable"><code>n</code></em><code class="literal">Y</code><em class="replaceable"><code>n</code></em><code class="literal">M</code><em class="replaceable"><code>n</code></em><code class="literal">D</code>. 
+            The <em class="replaceable"><code>n</code></em> numbers are the respective numbers
+            of years, months or days, any of which may be missing. Dates are
+            specified as  
+            <em class="replaceable"><code>YYYY</code></em>-<em class="replaceable"><code>MM</code></em>-<em class="replaceable"><code>DD</code></em>. 
+            The days and months parts may be missing. If the
+            <code class="literal">/</code> is present but an element is missing, the
+            missing element is interpreted as the lowest or highest date in the
+            index. Examples:</p><div class="itemizedlist"><ul class="itemizedlist" type="circle"><li class="listitem"><p><code class="literal">2001-03-01/2002-05-01</code> the
+	        basic syntax for an interval of dates.</p></li><li class="listitem"><p><code class="literal">2001-03-01/P1Y2M</code> the
+	        same specified with a period.</p></li><li class="listitem"><p><code class="literal">2001/</code> from the beginning of
+	        2001 to the latest date in the index.</p></li><li class="listitem"><p><code class="literal">2001</code> the whole year of
+	        2001</p></li><li class="listitem"><p><code class="literal">P2D/</code> means 2 days ago up to
+	        now if there are no documents with dates in the future.</p></li><li class="listitem"><p><code class="literal">/2003</code> all documents from
+	        2003 or older.</p></li></ul></div><p>Periods can also be specified with small letters (ie:
+	    p2y).</p></li><li class="listitem"><p><code class="literal">mime</code> or
+            <code class="literal">format</code> for specifying the
+            MIME type. This one is quite special because you can specify
+            several values which will be OR'ed (the normal default for the
+            language is AND). Ex: <code class="literal">mime:text/plain
+              mime:text/html</code>. Specifying an explicit boolean
+            operator before a
+            <code class="literal">mime</code> specification is not supported and
+            will produce strange results. You can filter out certain types
+            by using negation (<code class="literal">-mime:some/type</code>), and you can
+            use wildcards in the value (<code class="literal">mime:text/*</code>).
+            Note that <code class="literal">mime</code> is
+            the ONLY field with an OR default. You do need to use
+            <code class="literal">OR</code> with <code class="literal">ext</code> terms for
+            example.</p></li><li class="listitem"><p><code class="literal">type</code> or
+            <code class="literal">rclcat</code> for specifying the category (as in
+            text/media/presentation/etc.). The classification of MIME
+            types in categories is defined in the <span class="application">Recoll</span> configuration
+            (<code class="filename">mimeconf</code>), and can be modified or
+            extended. The default category names are those which permit
+            filtering results in the main GUI screen. Categories are OR'ed
+            like MIME types above. This can't be negated with
+            <code class="literal">-</code> either.</p></li></ul></div><p>Words inside phrases and capitalized words are not
+        stem-expanded. Wildcards may be used anywhere inside a term.
+        Specifying a wild-card on the left of a term can produce a very
+        slow search (or even an incorrect one if the expansion is
+        truncated because of excessive size). Also see 
+        <a class="link" href="RCL.SEARCH.ANCHORWILD.html#RCL.SEARCH.WILDCARDS" title="3.7.1. More about wildcards">
+          More about wildcards</a>.</p><p>The document input handlers used while indexing have the
+        possibility to create other fields with arbitrary names, and
+        aliases may be defined in the configuration, so that the exact
+        field search possibilities may be different for you if someone
+        took care of the customisation.</p><div class="sect2" title="3.5.1. Modifiers"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.SEARCH.LANG.MODIFIERS"></a>3.5.1. Modifiers</h3></div></div></div><p>Some characters are recognized as search modifiers when found
+          immediately after the closing double quote of a phrase, as in
+          <code class="literal">"some term"modifierchars</code>. The actual "phrase"
+          can be a single term of course. Supported modifiers:
+
+        </p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p><code class="literal">l</code> can be used to turn off
+            stemming (mostly makes sense with <code class="literal">p</code> because
+            stemming is off by default for phrases).</p></li><li class="listitem"><p><code class="literal">o</code> can be used to specify a
+            "slack" for phrase and proximity searches: the number of
+            additional terms that may be found between the specified
+            ones. If <code class="literal">o</code> is followed by an integer number,
+            this is the slack, else the default is 10.</p></li><li class="listitem"><p><code class="literal">p</code> can be used to turn the
+            default phrase search into a proximity one
+            (unordered). Example:<code class="literal">"order any in"p</code></p></li><li class="listitem"><p><code class="literal">C</code> will turn on case
+            sensitivity (if the index supports it).</p></li><li class="listitem"><p><code class="literal">D</code> will turn on diacritics
+                sensitivity (if the index supports it).</p></li><li class="listitem"><p>A weight can be specified for a query element
+            by specifying a decimal value at the start of the
+            modifiers. Example: <code class="literal">"Important"2.5</code>.</p></li></ul></div><p>
+      </p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="RCL.SEARCH.PTRANS.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="RCL.SEARCH.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="RCL.SEARCH.CASEDIAC.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">3.4. Path translations </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 3.6. Search case and diacritics sensitivity</td></tr></table></div></body></html>

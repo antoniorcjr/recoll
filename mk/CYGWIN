@@ -1,0 +1,10 @@
+
+include $(depth)/mk/commondefs
+include $(depth)/mk/localdefs
+
+ALL_CXXFLAGS = $(CXXFLAGS) $(COMMONCXXFLAGS) $(LOCALCXXFLAGS) \
+	 -D_GNU_SOURCE 
+
+LIBSYS = -lpthread -ldl
+LIBSYSTHREADS = 
+

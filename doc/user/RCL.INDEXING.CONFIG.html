@@ -1,0 +1,118 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>2.3. Index configuration</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="Recoll user manual"><link rel="up" href="RCL.INDEXING.html" title="Chapter 2. Indexing"><link rel="prev" href="RCL.INDEXING.STORAGE.html" title="2.2. Index storage"><link rel="next" href="RCL.INDEXING.WEBQUEUE.html" title="2.4. Indexing WEB pages you wisit"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">2.3. Index configuration</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="RCL.INDEXING.STORAGE.html">Prev</a> </td><th width="60%" align="center">Chapter 2. Indexing</th><td width="20%" align="right"> <a accesskey="n" href="RCL.INDEXING.WEBQUEUE.html">Next</a></td></tr></table><hr></div><div class="sect1" title="2.3. Index configuration"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="RCL.INDEXING.CONFIG"></a>2.3. Index configuration</h2></div></div></div><p>Variables set inside the 
+        <a class="link" href="RCL.INSTALL.CONFIG.html" title="5.4. Configuration overview"><span class="application">Recoll</span> configuration files</a>
+        control which areas of the file system are indexed, and how
+        files are processed. These variables can be set either by
+        editing the text files or by using the 
+        <a class="link" href="RCL.INDEXING.CONFIG.html#RCL.INDEXING.CONFIG.GUI" title="2.3.3. The index configuration GUI"> dialogs in the
+        <span class="command"><strong>recoll</strong></span> GUI</a>.</p><p>The first time you start <span class="command"><strong>recoll</strong></span>, you
+        will be asked whether or not you would like it to build the
+        index. If you want to adjust the configuration before
+        indexing, just click <span class="guilabel">Cancel</span> at this
+        point, which will get you into the configuration interface. If
+        you exit at this point, <code class="filename">recoll</code> will have
+        created a <code class="filename">~/.recoll</code> directory containing
+        empty configuration files, which you can edit by hand.</p><p>The configuration is documented inside the 
+        <a class="link" href="RCL.INSTALL.CONFIG.html" title="5.4. Configuration overview">installation chapter</a> 
+        of this document, or in the 
+       <span class="citerefentry"><span class="refentrytitle">recoll.conf</span>(5)</span>
+        man page, but the most
+        current information will most likely be the comments inside the
+        sample file. The most immediately useful variable you may
+        interested in is probably 
+        <a class="link" href="RCL.INSTALL.CONFIG.html#RCL.INSTALL.CONFIG.RECOLLCONF.TOPDIRS">
+	<code class="varname">topdirs</code></a>, 
+        which determines what subtrees get indexed.</p><p>The applications needed to index file types other than
+        text, HTML or email (ie: pdf, postscript, ms-word...) are
+        described in the <a class="link" href="RCL.INSTALL.EXTERNAL.html" title="5.2. Supporting packages">external
+          packages section.</a></p><p>As of Recoll 1.18 there are two incompatible types of Recoll
+      indexes, depending on the treatment of character case and
+      diacritics. The next section describes the two types in more
+      detail.</p><div class="sect2" title="2.3.1. Multiple indexes"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.INDEXING.CONFIG.MULTIPLE"></a>2.3.1. Multiple indexes</h3></div></div></div><p>Multiple <span class="application">Recoll</span> indexes can be created by
+	using several configuration directories which are usually set to
+	index different areas of the file system. A specific index can
+	be selected for updating or searching, using the
+	<code class="envar">RECOLL_CONFDIR</code> environment variable or the
+	<code class="option">-c</code> option to <span class="command"><strong>recoll</strong></span> and
+	<span class="command"><strong>recollindex</strong></span>.</p><p>A typical usage scenario for the multiple index feature
+	would be for a system administrator to set up a central index
+	for shared data, that you choose to search or not in addition to
+	your personal data. Of course, there are other
+	possibilities. There are many cases where you know the subset of
+	files that should be searched, and where narrowing the search
+	can improve the results. You can achieve approximately the same
+	effect with the directory filter in advanced search, but
+	multiple indexes will have much better performance and may be
+	worth the trouble.</p><p>A <span class="command"><strong>recollindex</strong></span> program instance can only
+	update one specific index.</p><p>The main index (defined by
+	<code class="envar">RECOLL_CONFDIR</code> or <code class="option">-c</code>) is
+	always active. If this is undesirable, you can set up your
+	base configuration to index an empty directory.</p><p>The different search interfaces (GUI, command line, ...)
+	have different methods to define the set of indexes to be
+	used, see the appropriate section.</p><p>If a set of multiple indexes are to be used together for
+	searches, some configuration parameters must be consistent
+	among the set. These are parameters which need to be the same
+	when indexing and searching. As the parameters come from the
+	main configuration when searching, they need to be compatible
+	with what was set when creating the other indexes (which came
+	from their respective configuration directories).</p><p>Most importantly, all indexes to be queried concurrently must
+        have the same option concerning character case and diacritics
+        stripping, but there are other constraints. Most of the
+	relevant parameters are described in the 
+	<a class="link" href="RCL.INSTALL.CONFIG.html#RCL.INSTALL.CONFIG.RECOLLCONF.TERMS" title="5.4.1.2. Parameters affecting how we generate terms:">linked
+	section</a>.</p></div><div class="sect2" title="2.3.2. Index case and diacritics sensitivity"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.INDEXING.CONFIG.SENS"></a>2.3.2. Index case and diacritics sensitivity</h3></div></div></div><p>As of <span class="application">Recoll</span> version 1.18 you have a choice of building an
+          index with terms stripped of character case and diacritics, or
+          one with raw terms. For a source term of
+          <code class="literal">Résumé</code>, the former will store
+          <code class="literal">resume</code>, the latter
+          <code class="literal">Résumé</code>.</p><p>Each type of index allows performing searches insensitive to
+          case and diacritics: with a raw index, the user entry will be
+          expanded to match all case and diacritics variations present in
+          the index. With a stripped index, the search term will be stripped
+          before searching.</p><p>A raw index allows for another possibility which a stripped
+          index cannot offer: using case and diacritics to discriminate
+          between terms, returning different results when searching for
+          <code class="literal">US</code> and <code class="literal">us</code> or
+          <code class="literal">resume</code> and <code class="literal">résumé</code>.
+          Read the <a class="link" href="RCL.SEARCH.CASEDIAC.html" title="3.6. Search case and diacritics sensitivity">section about search
+          case and diacritics sensitivity</a> for more details.</p><p>The type of index to be created is controlled by the
+          <code class="literal">indexStripChars</code> configuration
+          variable which can only be changed by editing the
+          configuration file. Any change implies an index reset (not
+          automated by <span class="application">Recoll</span>), and all indexes in a search must be set
+          in the same way (again, not checked by <span class="application">Recoll</span>). </p><p>If the <code class="literal">indexStripChars</code> is not set, <span class="application">Recoll</span>
+          1.18 creates a stripped index by default, for
+          compatibility with previous versions.</p><p>As a cost for added capability, a raw index will be slightly
+          bigger than a stripped one (around 10%). Also, searches will be
+          more complex, so probably slightly slower, and the feature is
+          still young, so that a certain amount of weirdness cannot be
+          excluded.</p><p>One of the most adverse consequence of using a raw index
+          is that some phrase and proximity searches may become
+          impossible: because each term needs to be expanded, and all
+          combinations searched for, the multiplicative expansion may
+          become unmanageable.</p></div><div class="sect2" title="2.3.3. The index configuration GUI"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.INDEXING.CONFIG.GUI"></a>2.3.3. The index configuration GUI</h3></div></div></div><p>Most parameters for a given index configuration can
+          be set from a <span class="command"><strong>recoll</strong></span> GUI running on this
+          configuration (either as default, or by setting
+          <code class="envar">RECOLL_CONFDIR</code> or the <code class="option">-c</code>
+          option.)</p><p>The interface is started from the
+	<span class="guimenu">Preferences</span> &#8594; <span class="guimenuitem">Index Configuration</span>
+	menu entry. It is divided in four tabs,
+        <span class="guilabel">Global parameters</span>, <span class="guilabel">Local
+        parameters</span>, <span class="guilabel">Web history</span>
+        (which is explained in the next section) and <span class="guilabel">Search
+        parameters</span>.</p><p>The <span class="guilabel">Global parameters</span> tab allows setting
+        global variables, like the lists of top directories, skipped paths,
+        or stemming languages.</p><p>The <span class="guilabel">Local parameters</span> tab allows setting
+        variables that can be redefined for subdirectories. This second tab
+        has an initially empty list of customisation directories, to which
+        you can add. The variables are then set for the currently selected
+        directory (or at the top level if the empty line is
+        selected).</p><p>The <span class="guilabel">Search parameters</span> section defines
+          parameters which are used at query time, but are global to an
+          index and affect all search tools, not only the GUI.</p><p>The meaning for most entries in the interface is 
+        self-evident and documented by a <code class="literal">ToolTip</code>
+        popup on the text label. For more detail, you will need to
+        refer to the <a class="link" href="RCL.INSTALL.CONFIG.html" title="5.4. Configuration overview">configuration
+        section</a> of this guide.</p><p>The configuration tool normally respects the comments
+        and most of the formatting inside the configuration file, so
+        that it is quite possible to use it on hand-edited files,
+        which you might nevertheless want to backup first...</p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="RCL.INDEXING.STORAGE.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="RCL.INDEXING.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="RCL.INDEXING.WEBQUEUE.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">2.2. Index storage </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 2.4. Indexing WEB pages you wisit</td></tr></table></div></body></html>

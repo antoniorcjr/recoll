@@ -1,0 +1,166 @@
+#!/bin/sh
+# Install recoll files.
+
+fatal()
+{
+    echo $*
+    exit 1
+}
+usage()
+{
+    fatal 'Usage: recollinstall [<prefixdir>], ie: recollinstall /usr/local'
+}
+
+if test $# -eq 0 ; then
+   PREFIX=@prefix@
+elif test $# -eq 1 ; then
+   PREFIX=$1
+else
+   usage
+fi
+QTGUI=@QTGUI@
+# The .qm files are in qtgui/i18n even if qt4 is used
+I18N=qtgui/i18n
+
+RCLLIBVERSION=@RCLLIBVERSION@
+
+test -n "$bindir" || bindir=${PREFIX}/bin
+test -n "$libdir" || libdir=${PREFIX}/lib
+test -n "$datadir" || datadir=${PREFIX}/share
+if test -z "$mandir" ; then 
+   if test -d ${PREFIX}/man ; then
+      mandir=${PREFIX}/man
+   else
+      mandir=${datadir}/man
+   fi
+fi
+
+REALPREFIX=$PREFIX
+ROOTFORPYTHON=""
+if test -n "$DESTDIR" ; then
+   PREFIX=$DESTDIR/$PREFIX
+   bindir=$DESTDIR/$bindir
+   libdir=$DESTDIR/$libdir
+   datadir=$DESTDIR/$datadir
+   mandir=$DESTDIR/$mandir
+   ROOTFORPYTHON="--root=${DESTDIR}"
+fi
+if test -f /etc/debian_version ; then
+   OPTSFORPYTHON=--install-layout=deb
+fi
+
+echo "Installing to $PREFIX"
+
+# Note: solaris 'install' does not understand -v
+INSTALL=${INSTALL:="install -c"}
+STRIP=${STRIP:=strip}
+
+sys=`uname`
+@NOQTMAKE@if test "$sys" = Darwin ; then
+@NOQTMAKE@    RECOLLPROG=${QTGUI}/recoll.app/Contents/MacOS/recoll
+@NOQTMAKE@else
+@NOQTMAKE@    RECOLLPROG=${QTGUI}/recoll
+@NOQTMAKE@fi
+
+TESTPROG=index/recollindex
+test -x $TESTPROG || fatal "$TESTPROG does not exist." \
+     " You need to build first (type 'make')."
+
+for d in \
+    ${bindir} \
+    ${libdir} \
+    ${libdir}/recoll \
+    ${mandir}/man1 \
+    ${mandir}/man5 \
+    ${datadir}/icons \
+    ${datadir}/recoll/doc \
+    ${datadir}/recoll/examples \
+    ${datadir}/recoll/filters \
+    ${datadir}/recoll/images \
+    ${datadir}/recoll/translations \
+    ${datadir}/icons/hicolor/48x48/apps \
+    ${datadir}/pixmaps
+do
+    test -d $d || mkdir -p $d || exit 1
+done
+
+@NOQTMAKE@test -d ${datadir}/applications \
+@NOQTMAKE@  || mkdir -p ${datadir}/applications || exit 1
+@NOQTMAKE@test -d ${datadir}/appdata \
+@NOQTMAKE@  || mkdir -p ${datadir}/appdata || exit 1
+
+# Use the xdg utilies to install the desktop file and icon? Couldn't find
+# out how to get this to work sanely. So keep the old way
+#PATH=$PATH:desktop/xdg-utils-1.0.1/scripts
+#export PATH
+#xdg-desktop-menu install desktop/recoll-searchgui.desktop
+#xdg-icon-resource install --size 48 desktop/recoll.png
+@NOQTMAKE@${INSTALL} -m 0444 desktop/recoll.appdata.xml ${datadir}/appdata
+@NOQTMAKE@${INSTALL} -m 0444 desktop/recoll-searchgui.desktop ${datadir}/applications
+@NOQTMAKE@${INSTALL} -m 0444 desktop/recoll.png ${datadir}/icons/hicolor/48x48/apps
+@NOQTMAKE@${INSTALL} -m 0444 desktop/recoll.png ${datadir}/pixmaps/
+
+if test -f doc/user/usermanual.html ; then
+    ${INSTALL} -m 0444 doc/user/usermanual.html doc/user/docbook.css \
+			${datadir}/recoll/doc 
+else
+    echo "User manual not found -> not installed"
+fi
+
+@NOQTMAKE@${INSTALL} -m 0444 doc/man/recoll.1 ${mandir}/man1/
+# Install the recollq man page in all cases, it's useful for recoll -t
+${INSTALL} -m 0444 doc/man/recollq.1 ${mandir}/man1/
+${INSTALL} -m 0444 doc/man/recollindex.1 ${mandir}/man1/
+${INSTALL} -m 0444 doc/man/recoll.conf.5  ${mandir}/man5/
+
+@NOQTMAKE@${INSTALL} -m 0755 ${RECOLLPROG} ${bindir} || exit 1
+@NOQTMAKE@${STRIP} ${bindir}/recoll 
+@NOCMDLINE@${INSTALL} -m 0755 query/recollq ${bindir} || exit 1
+@NOCMDLINE@${STRIP} ${bindir}/recollq 
+${INSTALL} -m 0755 index/recollindex ${bindir} || exit 1
+${STRIP} ${bindir}/recollindex
+
+@NODYNLIB@${INSTALL} -m 0644 lib/librecoll.so.${RCLLIBVERSION} \
+@NODYNLIB@    ${libdir}/recoll/ || exit 1
+
+${INSTALL} -m 0755 filters/rcl* ${datadir}/recoll/filters/ || exit 1
+${INSTALL} -m 0555 filters/ppt-dump.py ${datadir}/recoll/filters/ || exit 1
+${INSTALL} -m 0555 filters/xls-dump.py ${datadir}/recoll/filters/ || exit 1
+${INSTALL} -m 0555 filters/xlsxmltocsv.py ${datadir}/recoll/filters/ || exit 1
+
+${INSTALL} -m 0444 filters/msodump.zip ${datadir}/recoll/filters/ || exit 1
+for f in rclexecm.py rcllatinstops.zip;do
+    chmod 644 ${datadir}/recoll/filters/$f
+done
+
+${INSTALL} -m 0755 desktop/xdg-utils-1.0.1/scripts/xdg-open \
+	   ${datadir}/recoll/filters/ || exit 1
+${INSTALL} -m 0755 desktop/hotrecoll.py \
+	   ${datadir}/recoll/filters/ || exit 1
+${INSTALL} -m 0644 python/recoll/recoll/rclconfig.py \
+	   ${datadir}/recoll/filters/ || exit 1
+
+${INSTALL} -m 0444 \
+           desktop/recollindex.desktop \
+           sampleconf/fragbuts.xml \
+	   sampleconf/mimeconf \
+	   sampleconf/mimeview \
+	   sampleconf/recoll.conf \
+           sampleconf/mimemap \
+           sampleconf/fields \
+           sampleconf/recoll.qss \
+	   ${datadir}/recoll/examples/ || exit 1
+${INSTALL} -m 0755 index/rclmon.sh ${datadir}/recoll/examples/ || exit 1
+
+
+${INSTALL} -m 0444 qtgui/mtpics/*.png ${datadir}/recoll/images || exit 1
+
+${INSTALL} -m 0444 ${I18N}/recoll*.qm ${datadir}/recoll/translations || exit 1
+# Install the simplified chinese file as just chinese until I can understand
+# if it's possible to have both. zh_CN doesn't seem to work
+${INSTALL} -m 0444 ${I18N}/recoll_zh_CN.qm \
+    ${datadir}/recoll/translations/recoll_zh.qm || exit 1
+
+
+@NOPYTHON@(cd python/recoll;python setup.py install \
+@NOPYTHON@ --prefix=${REALPREFIX} ${ROOTFORPYTHON} ${OPTSFORPYTHON})

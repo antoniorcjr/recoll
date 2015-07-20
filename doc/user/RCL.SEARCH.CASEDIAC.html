@@ -1,0 +1,36 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>3.6. Search case and diacritics sensitivity</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="Recoll user manual"><link rel="up" href="RCL.SEARCH.html" title="Chapter 3. Searching"><link rel="prev" href="RCL.SEARCH.LANG.html" title="3.5. The query language"><link rel="next" href="RCL.SEARCH.ANCHORWILD.html" title="3.7. Anchored searches and wildcards"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">3.6. Search case and diacritics sensitivity</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="RCL.SEARCH.LANG.html">Prev</a> </td><th width="60%" align="center">Chapter 3. Searching</th><td width="20%" align="right"> <a accesskey="n" href="RCL.SEARCH.ANCHORWILD.html">Next</a></td></tr></table><hr></div><div class="sect1" title="3.6. Search case and diacritics sensitivity"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="RCL.SEARCH.CASEDIAC"></a>3.6. Search case and diacritics sensitivity</h2></div></div></div><p>For <span class="application">Recoll</span> versions 1.18 and later, and <span class="emphasis"><em>when working
+          with a raw index</em></span> (not the default), searches can be
+          made sensitive
+        to character case and diacritics. How this happens is controlled by
+        configuration variables and what search data is entered.</p><p>The general default is that searches are insensitive to case
+      and diacritics. An entry of <code class="literal">resume</code> will match any
+      of <code class="literal">Resume</code>, <code class="literal">RESUME</code>,
+      <code class="literal">résumé</code>, <code class="literal">Résumé</code> etc.</p><p>Two configuration variables can automate switching on
+        sensitivity:</p><div class="variablelist"><dl><dt><span class="term">autodiacsens</span></dt><dd><p>If this is set, search
+              sensitivity to diacritics will be turned on as soon as an
+              accented character exists in a search term. When the variable
+              is set to true, <code class="literal">resume</code> will start a
+              diacritics-unsensitive search, but <code class="literal">résumé</code>
+              will be matched exactly. The default value is
+              <span class="emphasis"><em>false</em></span>.</p></dd><dt><span class="term">autocasesens</span></dt><dd><p>If this is set, search
+              sensitivity to character case will be turned on as soon as an
+              upper-case character exists in a search term <span class="emphasis"><em>except
+              for the first one</em></span>. When the variable is set to
+              true, <code class="literal">us</code> or <code class="literal">Us</code> will
+              start a diacritics-unsensitive search, but
+              <code class="literal">US</code> will be matched exactly. The default
+              value is <span class="emphasis"><em>true</em></span> (contrary to
+              <code class="literal">autodiacsens</code>).</p></dd></dl></div><p>As in the past, capitalizing the first letter of a word will
+        turn off its stem expansion and have no effect on
+        case-sensitivity.</p><p>You can also explicitely activate case and diacritics
+      sensitivity by using modifiers with the query
+      language. <code class="literal">C</code> will make the term case-sensitive, and
+      <code class="literal">D</code> will make it
+      diacritics-sensitive. Examples:</p><pre class="programlisting">
+        "us"C
+   </pre><p>will search for the term <code class="literal">us</code> exactly
+      (<code class="literal">Us</code> will not be a match).</p><pre class="programlisting">
+        "resume"D
+      </pre><p>will search for the term <code class="literal">resume</code> exactly
+      (<code class="literal">résumé</code> will not be a match).</p><p>When either case or diacritics sensitivity is activated, stem
+        expansion is turned off. Having both does not make much sense.</p></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="RCL.SEARCH.LANG.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="RCL.SEARCH.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="RCL.SEARCH.ANCHORWILD.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">3.5. The query language </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 3.7. Anchored searches and wildcards</td></tr></table></div></body></html>

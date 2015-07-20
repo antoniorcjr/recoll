@@ -1,0 +1,88 @@
+#!/usr/bin/env python
+
+# Tar-file filter for Recoll
+# Thanks to Recoll user Martin Ziegler
+# This is a modified version of /usr/share/recoll/filters/rclzip
+# It works not only for tar-files, but automatically for gzipped and
+# bzipped tar-files at well.
+
+import rclexecm
+
+try:
+    import tarfile
+except:
+    print "RECFILTERROR HELPERNOTFOUND python:tarfile"
+    sys.exit(1);
+
+class TarExtractor:
+    def __init__(self, em):
+        self.currentindex = 0
+        self.em = em
+        self.namen = []
+
+    def extractone(self, ipath):
+        docdata = ""
+        try:
+            info = self.tar.getmember(ipath)
+            if info.size > self.em.maxmembersize:
+                # skip
+                docdata = ""
+                self.em.rclog("extractone: entry %s size %d too big" %
+                              (ipath, info.size))
+                docdata = "" # raise TarError("Member too big")
+            else:
+                docdata = self.tar.extractfile(ipath).read()
+            ok = True
+        except Exception, err:
+            ok = False
+        iseof = rclexecm.RclExecM.noteof
+        if self.currentindex >= len(self.namen) -1:
+            iseof = rclexecm.RclExecM.eofnext
+        if isinstance(ipath, unicode):
+            ipath = ipath.encode("utf-8")
+        return (ok, docdata, ipath, iseof)
+
+    def openfile(self, params):
+        self.currentindex = -1
+        try:
+            self.tar = tarfile.open(name=params["filename:"],mode='r')
+            self.namen = [ y.name for y in filter(lambda z:z.isfile(),self.tar.getmembers())]
+            return True
+        except:
+            return False
+
+    def getipath(self, params):
+        ipath = params["ipath:"]
+        ok, data, ipath, eof = self.extractone(ipath)
+        if ok:
+            return (ok, data, ipath, eof)
+        try:
+            ipath = ipath.decode("utf-8")
+            return self.extractone(ipath)
+        except Exception, err:
+            return (ok, data, ipath, eof)
+
+    def getnext(self, params):
+
+        if self.currentindex == -1:
+            # Return "self" doc
+            self.currentindex = 0
+            self.em.setmimetype('text/plain')
+            if len(self.namen) == 0:
+                eof = rclexecm.RclExecM.eofnext
+            else:
+                eof = rclexecm.RclExecM.noteof
+            return (True, "", "", eof)
+
+        if self.currentindex >= len(self.namen):
+            self.namen=[]
+            return (False, "", "", rclexecm.RclExecM.eofnow)
+        else:
+            ret= self.extractone(self.namen[self.currentindex])
+            self.currentindex += 1
+            return ret
+
+
+proto = rclexecm.RclExecM()
+extract = TarExtractor(proto)
+rclexecm.main(proto, extract)

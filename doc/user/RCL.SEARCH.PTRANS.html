@@ -1,0 +1,32 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>3.4. Path translations</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="Recoll user manual"><link rel="up" href="RCL.SEARCH.html" title="Chapter 3. Searching"><link rel="prev" href="RCL.SEARCH.COMMANDLINE.html" title="3.3. Searching on the command line"><link rel="next" href="RCL.SEARCH.LANG.html" title="3.5. The query language"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">3.4. Path translations</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="RCL.SEARCH.COMMANDLINE.html">Prev</a> </td><th width="60%" align="center">Chapter 3. Searching</th><td width="20%" align="right"> <a accesskey="n" href="RCL.SEARCH.LANG.html">Next</a></td></tr></table><hr></div><div class="sect1" title="3.4. Path translations"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="RCL.SEARCH.PTRANS"></a>3.4. Path translations</h2></div></div></div><p>In some cases, the document paths stored inside the index do
+      not match the actual ones, so that document
+      previews and accesses will fail. This can occur in a number of
+      circumstances:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>When using multiple indexes it is a relatively common
+          occurrence that some will actually reside on a remote volume, for
+          exemple mounted via NFS. In this case, the paths used to access
+          the documents on the local machine are not necessarily the same
+          than the ones used while indexing on the remote machine. For
+          example, <code class="filename">/home/me</code> may have been used as
+          a <code class="literal">topdirs</code> elements while indexing, but the
+          directory might be mounted
+          as <code class="filename">/net/server/home/me</code> on the local
+          machine.</p></li><li class="listitem"><p>The case may also occur with removable
+          disks. It is perfectly possible to configure an index to
+          live with the documents on the removable disk, but it may
+          happen that the disk is not mounted at the same place so
+          that the documents paths from the index are
+          invalid.</p></li><li class="listitem"><p>As a last exemple, one could imagine that a big
+          directory has been moved, but that it is currently
+          inconvenient to run the indexer.</p></li></ul></div><p>More generally, the path translation facility may be useful
+      whenever the documents paths seen by the indexer are not the same
+      as the ones which should be used at query time.</p><p><span class="application">Recoll</span> has a facility for rewriting access paths when
+      extracting the data from the index. The translations can be
+      defined for the main index and for any additional query
+      index.</p><p>In the above NFS example, <span class="application">Recoll</span> could be instructed to
+      rewrite any <code class="filename">file:///home/me</code> URL from the
+      index to <code class="filename">file:///net/server/home/me</code>,
+      allowing accesses from the client.</p><p>The translations are defined in the 
+      <a class="link" href="RCL.INSTALL.CONFIG.html#RCL.INSTALL.CONFIG.PTRANS" title="5.4.6. The ptrans file">
+        <code class="filename">ptrans</code></a> configuration file, which
+        can be edited by hand or from the GUI external indexes
+      configuration dialog.</p></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="RCL.SEARCH.COMMANDLINE.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="RCL.SEARCH.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="RCL.SEARCH.LANG.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">3.3. Searching on the command line </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 3.5. The query language</td></tr></table></div></body></html>

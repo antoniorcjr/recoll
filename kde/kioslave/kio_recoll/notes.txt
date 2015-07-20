@@ -1,0 +1,188 @@
+Recoll KIO Slave notes/todoes/etc.
+
+Goal: access Recoll search from other applications. 
+
+We want to allow URLs like recoll:/?? to be used inside
+Konqueror/Dolphin and open dialogs, to start a search with results
+displayed/used inside the application.
+
+
+Todoes
+======
+
+
+Implementation notes:
+====================
+
+- There are two main ways to do this: 
+  - a-la kio_beagle, using listDir() to list entries pointing to the
+    different operations or objects (help, status, search result
+    entries, bookmarks, whatever...). The nice thing is that the
+    results really look like file object in a directory (probably,
+    didn't try it actually), no need for look and feel, it's provided by
+    KDE 
+
+  - Or a la strigi: all interactions are through html pages and get()
+    operations.  Much simpler, but does not allow file management
+    operations (except by drag/drop from the result list), and can't
+    use it inside other application's Open dialogs.
+
+Recoll is currently doing both things on KDE4.1 (only html for KDE4.0). 
+
+
+Virtual tree:
+=============
+
+recoll: 
+recoll:/
+recoll:/help.html
+recoll:/search.html
+    Purely synthetic top level entries. Yes, given the following, this means
+    that you can't search for 'help.html' directly (but you can do it through 
+    the html interface). These have to exist in the top level directory
+
+recoll:/some search string
+recoll:/some search string/
+ We have a 'mode' determined by the protocol name:
+  	 recoll -> mixed
+	 recollf -> file manager
+  - html mode: these redirect to recoll://search/query?q="some search string"
+  - file manager mode: do the search and display results.
+  - mixed mode: what mode is entered depends on ending /
+
+recoll://search/query?q=...
+  html mode search  
+
+recoll:/some search string/recollResultxyz
+xyz is the index in result list.
+
+When generating a directory, with use bogus names for the result
+entries (the displayed ones are from UDS_DISPLAY_NAME and are the real
+names). When doing drag/drop or "open with" Konqueror/Dolphin builds
+an url by concatenating the current directory name and the UDS_NAME,
+instead of using UDS_TARGET_URL as when the entry is clicked. This
+forces us to use identifying names including the result number, which
+has many ennoying side effects (such as the target app not knowing the
+real file path...
+
+
+KIO notes:
+=========
+
+- Slaves are reused seemingly at random. Even with connection-oriented
+  ones (ie ftp), you can have 2 konqueror windows on different hosts
+  with only one slave which will have to close/reopen the connection at
+  each switch.
+   For slaves with really expensive internal state, this is very wasteful.
+
+- Use cases for father_url+name or target_url are ill defined.
+- Need a way to block autocompletion queries !
+- No way to display the target URL in konqueror
+
+Todoes
+======
+- Improve the html interface to support more functions
+ - Category filtering
+ - Sorting
+
+- Find a way to use the html form to enter the query and get the
+  results as a directory ?  - Would it be possible to use a redirect
+  to switch to the directory-oriented results for a query from the
+  html form ? 
+  -> No, even a redirect to a form that would initially trigger a
+     listDir() triggers a get() when performed from a get()
+
+KDE misc notes
+==================
+Debug areas: /usr/share/kde4/config/kdebug.areas
+kdebugdialog [--fullmode] pour configurer
+./.kde/share/config/kdebugrc
+Output to ~/.xession-errors by default. How to change ?
+
+kio_recoll misc notes:
+===========================
+Probleme quand l'url se termine par un / et qu'on edite le mot,
+konqueror lance une recherche a chaque lettre.
+
+Apparemment c'est l'entree "listing" du .protocol qui decide si le plugin
+est traité plutot comme un dirlister ou comme un htmlgetter. Curieusement,
+le changement ne s'opere pas toujours immediatement quand on change le
+fichier .proto, y compris apres avoir tue tous les process kde (changement
+à la deuxieme execution de konqueror sur kde4.0). Sur kde4.0 il faut que le
+.proto soit sans entree "listing"
+
+Problemes de gestion de l'etat
+===============================
+Les KIO slaves ne sont pas associes a une fenetre ! ils sont
+reutilises au hasard, et leur etat n'a aucune raison de correspondre a
+celui de l'affichage. On peut tres bien avoir 1 fenetre 2 kio ou 1 kio
+deux fenetres, et le next d'un search peut arriver au kio qui a
+l'autre search, donc n'importenaouak. Il faudrait que l'etat soit
+partage et accede par un identifiant uniquement determine par l'url de
+la fenetre.
+
+Meme pour une fenetre unique, au bout d'un moment le kio timeout et exite.
+
+En fait les slaves ne peuvent pas stocker d'etat du tout. Donc:
+ - soit un serveur central auquel ils parlent
+ - soit ils relancent dynamiquement les recherches si pas de match
+C'est vrai aussi bien pour les dirlists que pour la version html. 
+
+J'ai essaye de mettre une boucle timeout callback callspecial() mais
+ca ne sert a rien, c'est gere dans le process kio_slave, ca ne
+maintient pas l'association avec un konqueror.
+
+KDE_FORK_SLAVES sort of solves the problem in a limited way: 
+ - It applies to an application instance, not a KIO slave type, so it
+   affects other KIO usages.  
+ - If the application has 2 sessions with the same KIO there are no 
+   warranties that 1 kio per session will be used ?
+
+
+
+Old KDE3 notes, 
+===============
+
+kio_recoll has not been checked or worked under KDE3 for eons, no
+reason to believe it works.
+
+- Not using libtool. Probably should. compilation flags in the Makefile
+  were copy-pasted from a kdebase compilation tree on FreeBSD (kio/man).
+- You MUST install a kio_recoll.la in lib/kde3 along with kio_recoll.so,
+  else kdeinit won't be able to load the lib (probably uses the libltdl
+  thingy?). The one in this directory was duplicated/adjusted from
+  kio_man.la. The contents don't seem too critical, just needs to exist.
+- If you want to try, compile, then install kio_recoll.la kio_recoll.so
+  wherever kde keeps its plugins (ie: lib/kde3), and recoll.protocol in the
+  services directory (share/services ? look for other .protocol file).
+- I saw after doing the build/config mockup that kdevelop can generate a
+  kio_slave project. This might be the next thing to do. otoh would need to
+  separate the kio from the main source to avoid having to distribute 2megs
+  of kde build config files.
+
+
+
+Connected mode
+==============
+Tried to add bogus connection status to see if this would prevent switching between apps/slaves, doesnt... checked that's the same for kio_ftp
+
+void RecollProtocol::openConnection() 
+{
+    kDebug();
+    connected();
+}
+void RecollProtocol::closeConnection() 
+{
+    kDebug();
+}
+void RecollProtocol::setHost(const QString& host, quint16, 
+			     const QString&, const QString&)
+{
+    kDebug() << host;
+}
+void RecollProtocol::slave_status()
+{
+    kDebug();
+    slaveStatus("search", true);
+}
++    connected(); call in maybeopendb()

@@ -1,0 +1,20 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>2.4. Indexing WEB pages you wisit</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="Recoll user manual"><link rel="up" href="RCL.INDEXING.html" title="Chapter 2. Indexing"><link rel="prev" href="RCL.INDEXING.CONFIG.html" title="2.3. Index configuration"><link rel="next" href="RCL.INDEXING.EXTATTR.html" title="2.5. Extended attributes data"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">2.4. Indexing WEB pages you wisit</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="RCL.INDEXING.CONFIG.html">Prev</a> </td><th width="60%" align="center">Chapter 2. Indexing</th><td width="20%" align="right"> <a accesskey="n" href="RCL.INDEXING.EXTATTR.html">Next</a></td></tr></table><hr></div><div class="sect1" title="2.4. Indexing WEB pages you wisit"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="RCL.INDEXING.WEBQUEUE"></a>2.4. Indexing WEB pages you wisit</h2></div></div></div><p>With the help of a <span class="application">Firefox</span>
+      extension, <span class="application">Recoll</span> can index the Internet pages that you visit. The
+      extension was initially designed for the
+      <span class="application">Beagle</span> indexer, but it has recently be
+      renamed and better adapted to <span class="application">Recoll</span>.</p><p>The extension works by copying visited WEB pages to an indexing
+         queue directory, which <span class="application">Recoll</span> then processes, indexing the data,
+         storing it into a local cache, then removing the file from the
+         queue.</p><p>This feature can be enabled in the GUI 
+        <span class="guilabel">Index configuration</span>
+	panel, or by editing the configuration file (set
+	<code class="varname">processwebqueue</code> to 1).</p><p>A current pointer to the extension can be found, along with
+        up-to-date instructions, on the
+        <a class="ulink" href="http://bitbucket.org/medoc/recoll/wiki/IndexWebHistory" target="_top">Recoll wiki</a>.</p><p>A copy of the indexed WEB pages is retained by Recoll in a
+      local cache (from which previews can be fetched). The cache size can
+      be adjusted from the <span class="guilabel">Index configuration</span> /
+      <span class="guilabel">Web history</span> panel. Once the maximum size
+      is reached, old pages are purged - both from the cache and the index
+      - to make room for new ones, so you need to explicitly archive in
+        some other place the pages that you want to keep
+        indefinitely.</p></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="RCL.INDEXING.CONFIG.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="RCL.INDEXING.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="RCL.INDEXING.EXTATTR.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">2.3. Index configuration </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 2.5. Extended attributes data</td></tr></table></div></body></html>

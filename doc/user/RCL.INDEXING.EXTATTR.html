@@ -1,0 +1,16 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>2.5. Extended attributes data</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="Recoll user manual"><link rel="up" href="RCL.INDEXING.html" title="Chapter 2. Indexing"><link rel="prev" href="RCL.INDEXING.WEBQUEUE.html" title="2.4. Indexing WEB pages you wisit"><link rel="next" href="RCL.INDEXING.EXTTAGS.html" title="2.6. Importing external tags"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">2.5. Extended attributes data</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="RCL.INDEXING.WEBQUEUE.html">Prev</a> </td><th width="60%" align="center">Chapter 2. Indexing</th><td width="20%" align="right"> <a accesskey="n" href="RCL.INDEXING.EXTTAGS.html">Next</a></td></tr></table><hr></div><div class="sect1" title="2.5. Extended attributes data"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="RCL.INDEXING.EXTATTR"></a>2.5. Extended attributes data</h2></div></div></div><p>User extended attributes are named pieces of information
+        that most modern file systems can attach to any file.</p><p><span class="application">Recoll</span> versions 1.19 and later process extended attributes
+        as document fields by default. For older versions, this has to
+        be activated at build time.</p><p>A 
+        <a class="ulink" href="http://www.freedesktop.org/wiki/CommonExtendedAttributes" target="_top">
+          freedesktop standard</a> defines a few special
+          attributes, which are handled as such by <span class="application">Recoll</span>:
+        </p><div class="variablelist"><dl><dt><span class="term">mime_type</span></dt><dd><p>If set, this overrides any other
+                determination of the file MIME type.</p></dd><dt><span class="term">charset</span></dt><dd>If set, this defines the file character set
+              (mostly useful for plain text files).</dd></dl></div><p>
+      </p><p>By default, other attributes are handled as <span class="application">Recoll</span> fields.
+        On Linux, the <code class="literal">user</code> prefix is removed from
+        the name. This can be configured more precisely inside
+        the <a class="link" href="RCL.INSTALL.CONFIG.html#RCL.INSTALL.CONFIG.FIELDS" title="5.4.2. The fields file">
+          <code class="filename">fields</code> configuration file</a>.
+      </p></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="RCL.INDEXING.WEBQUEUE.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="RCL.INDEXING.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="RCL.INDEXING.EXTTAGS.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">2.4. Indexing WEB pages you wisit </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 2.6. Importing external tags</td></tr></table></div></body></html>

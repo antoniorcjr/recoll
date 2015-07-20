@@ -1,0 +1,80 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>2.8. Real time indexing</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="Recoll user manual"><link rel="up" href="RCL.INDEXING.html" title="Chapter 2. Indexing"><link rel="prev" href="RCL.INDEXING.PERIODIC.html" title="2.7. Periodic indexing"><link rel="next" href="RCL.SEARCH.html" title="Chapter 3. Searching"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">2.8. Real time indexing</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="RCL.INDEXING.PERIODIC.html">Prev</a> </td><th width="60%" align="center">Chapter 2. Indexing</th><td width="20%" align="right"> <a accesskey="n" href="RCL.SEARCH.html">Next</a></td></tr></table><hr></div><div class="sect1" title="2.8. Real time indexing"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="RCL.INDEXING.MONITOR"></a>2.8. Real time indexing</h2></div></div></div><p>Real time monitoring/indexing is performed by starting the
+        <span class="command"><strong>recollindex</strong></span> <code class="option">-m</code> command.
+        With this option, <span class="command"><strong>recollindex</strong></span> will detach
+        from the terminal and become a daemon, permanently monitoring
+        file changes and updating the index.</p><p>Under <span class="application">KDE</span>,
+      <span class="application">Gnome</span> and some other desktop
+      environments, the daemon can automatically started when you log
+      in, by creating a desktop file inside the
+      <code class="filename">~/.config/autostart</code> directory.  This can be
+      done for you by the <span class="application">Recoll</span> GUI. Use the
+      <span class="guimenu">Preferences-&gt;Indexing Schedule</span> menu.</p><p>With older <span class="application">X11</span> setups, starting
+        the daemon is normally performed as part of the user session
+        script.</p><p>The <code class="filename">rclmon.sh</code> script can be used to
+      easily start and stop the daemon. It can be found in the
+      <code class="filename">examples</code> directory (typically
+      <code class="filename">/usr/local/[share/]recoll/examples</code>).</p><p>For example, my out of fashion
+        <span class="application">xdm</span>-based session has a
+        <code class="filename">.xsession</code> script with the following lines
+        at the end:</p><pre class="programlisting">recollconf=$HOME/.recoll-home
+recolldata=/usr/local/share/recoll
+RECOLL_CONFDIR=$recollconf $recolldata/examples/rclmon.sh start
+
+fvwm 
+
+</pre><p>The indexing daemon gets started, then the window manager,
+        for which the session waits.</p><p>By default the
+        indexing daemon will monitor the state of the X11 session, and
+        exit when it finishes, it is not necessary to kill it
+        explicitly. (The <span class="application">X11</span> server
+        monitoring can be disabled with option <code class="option">-x</code> to
+        <span class="command"><strong>recollindex</strong></span>).</p><p>If you use the daemon completely out of an
+        <span class="application">X11</span> session, you need to add option
+        <code class="option">-x</code> to disable <span class="application">X11</span> session monitoring (else
+        the daemon will not start).</p><p>By default, the messages from the indexing daemon will be
+        discarded. You may want to change this by setting the
+        <code class="varname">daemlogfilename</code> and
+        <code class="varname">daemloglevel</code> configuration parameters. Also the
+        log file will only be truncated when the daemon starts. If the
+        daemon runs permanently, the log file may grow quite big, depending
+        on the log level.</p><p>When building <span class="application">Recoll</span>, the real time indexing support can be
+        customised during package <a class="link" href="RCL.INSTALL.BUILDING.html#RCL.INSTALL.BUILDING.BUILD" title="5.3.2. Building">configuration</a> with
+        the <code class="option">--with[out]-fam</code> or
+        <code class="option">--with[out]-inotify</code> options.  The default is
+        currently to include <span class="application">inotify</span>
+        monitoring on systems that support it, and, as of <span class="application">Recoll</span> 1.17,
+        <span class="application">gamin</span> support on
+        <span class="application">FreeBSD</span>.</p><p>While it is convenient that data is indexed in real time,
+        repeated indexing can generate a significant load on the
+        system when files such as email folders change. Also,
+        monitoring large file trees by itself significantly taxes
+        system resources. You probably do not want to enable it if
+        your system is short on resources. Periodic indexing is
+        adequate in most cases.</p><div class="note" title="Increasing resources for inotify" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Increasing resources for inotify</h3><p>On Linux systems, monitoring a big tree may need
+	  increasing the resources available to inotify, which are
+	  normally defined in <code class="filename">/etc/sysctl.conf</code>.
+	  </p><pre class="programlisting">
+### inotify
+#
+# cat  /proc/sys/fs/inotify/max_queued_events   - 16384
+# cat  /proc/sys/fs/inotify/max_user_instances  - 128
+# cat  /proc/sys/fs/inotify/max_user_watches    - 16384
+#
+# -- Change to:
+#
+fs.inotify.max_queued_events=32768
+fs.notify.max_user_instances=256
+fs.inotify.max_user_watches=32768
+	  </pre><p>
+    
+	</p><p>Especially, you will need to trim your tree or adjust
+        the <code class="literal">max_user_watches</code> value if indexing exits with
+        a message about errno <code class="literal">ENOSPC</code> (28) from
+          <code class="function">inotify_add_watch</code>.</p></div><div class="sect2" title="2.8.1. Slowing down the reindexing rate for fast changing files"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.INDEXING.MONITOR.FASTFILES"></a>2.8.1. Slowing down the reindexing rate for fast changing
+        files</h3></div></div></div><p>When using the real time monitor, it may happen that some
+        files need to be indexed, but change so often that they impose an
+        excessive load for the system.</p><p><span class="application">Recoll</span> provides a configuration option to specify the minimum
+        time before which a file, specified by a wildcard pattern, cannot be
+        reindexed. See the <code class="varname">mondelaypatterns</code> parameter in
+        the <a class="link" href="RCL.INSTALL.CONFIG.html#RCL.INSTALL.CONFIG.RECOLLCONF.MISC" title="5.4.1.5. Miscellaneous parameters:">
+         configuration section</a>.</p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="RCL.INDEXING.PERIODIC.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="RCL.INDEXING.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="RCL.SEARCH.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">2.7. Periodic indexing </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Chapter 3. Searching</td></tr></table></div></body></html>

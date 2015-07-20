@@ -1,0 +1,9 @@
+include $(depth)/mk/commondefs
+include $(depth)/mk/localdefs
+
+ALL_CXXFLAGS = $(CXXFLAGS) $(COMMONCXXFLAGS) $(LOCALCXXFLAGS) 
+
+CC = gcc
+CXX = g++
+
+LIBSYS = -lpthread -lnsl -lsocket -ldl

@@ -1,0 +1,79 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>5.2. Supporting packages</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="Recoll user manual"><link rel="up" href="RCL.INSTALL.html" title="Chapter 5. Installation and configuration"><link rel="prev" href="RCL.INSTALL.html" title="Chapter 5. Installation and configuration"><link rel="next" href="RCL.INSTALL.BUILDING.html" title="5.3. Building from source"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">5.2. Supporting packages</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="RCL.INSTALL.html">Prev</a> </td><th width="60%" align="center">Chapter 5. Installation and configuration</th><td width="20%" align="right"> <a accesskey="n" href="RCL.INSTALL.BUILDING.html">Next</a></td></tr></table><hr></div><div class="sect1" title="5.2. Supporting packages"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="RCL.INSTALL.EXTERNAL"></a>5.2. Supporting packages</h2></div></div></div><p><span class="application">Recoll</span> uses external applications to index some file
+        types. You need to install them for the file types that you wish to
+        have indexed (these are run-time optional dependencies. None is
+        needed for building or running <span class="application">Recoll</span> except for indexing their
+        specific file type).</p><p>After an indexing pass, the commands that were found
+	missing can be displayed from the <span class="command"><strong>recoll</strong></span>
+	<span class="guilabel">File</span> menu. The list is stored in the
+	<code class="filename">missing</code> text file inside the configuration
+	directory.</p><p>A list of common file types which need external
+        commands follows. Many of the handlers need the
+        <span class="command"><strong>iconv</strong></span> command, which is not always listed as a
+        dependancy.</p><p>Please note that, due to the relatively dynamic nature of this
+	information, the most up to date version is now kept on <a class="ulink" href="http://www.recoll.org/features.html" target="_top">http://www.recoll.org/features.html</a>
+	along with links to the home pages or best source/patches pages,
+	and misc tips. The list below is not updated often and may be quite
+	stale.</p><p>For many Linux distributions, most of the commands listed can
+        be installed from the package repositories. However, the packages
+        are sometimes outdated, or not the best version for <span class="application">Recoll</span>, so you
+        should take a look at <a class="ulink" href="http://www.recoll.org/features.html" target="_top">http://www.recoll.org/features.html</a> if a file
+        type is important to you.</p><p>As of <span class="application">Recoll</span> release 1.14, a number of XML-based formats that
+        were handled by ad hoc handler code now use the
+        <span class="command"><strong>xsltproc</strong></span> command, which usually comes with  
+	  <span class="application">libxslt</span>. These are: abiword, fb2
+	  (ebooks), kword, openoffice, svg.</p><p>Now for the list:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>Openoffice files need <span class="command"><strong>unzip</strong></span> and
+        <span class="command"><strong>xsltproc</strong></span>.</p></li><li class="listitem"><p>PDF files need <span class="command"><strong>pdftotext</strong></span>
+        which is part of <span class="application">Poppler</span> (usually
+        comes with the <code class="literal">poppler-utils</code>
+        package). Avoid the original one from 
+        <span class="application">Xpdf</span>.</p></li><li class="listitem"><p>Postscript files need <span class="command"><strong>pstotext</strong></span>. 
+            The original version has an issue with shell
+            character in file names, which is corrected in recent
+            packages. See <a class="ulink" href="http://www.recoll.org/features.html" target="_top">http://www.recoll.org/features.html</a> for more detail.</p></li><li class="listitem"><p>MS Word needs
+        <span class="command"><strong>antiword</strong></span>. It is also useful to have
+        <span class="command"><strong>wvWare</strong></span> installed as it may be 
+        be used as a fallback for some files which
+        <span class="command"><strong>antiword</strong></span> does not handle.</p></li><li class="listitem"><p>MS Excel and PowerPoint are processed by
+        internal <span class="command"><strong>Python</strong></span> handlers.</p></li><li class="listitem"><p>MS Open XML (docx) needs <span class="command"><strong>
+         xsltproc</strong></span>.</p></li><li class="listitem"><p>Wordperfect files need <span class="command"><strong>wpd2html</strong></span>
+        from the <span class="application">libwpd</span> (or
+        <span class="application">libwpd-tools</span> on Ubuntu)
+        package.</p></li><li class="listitem"><p>RTF files need <span class="command"><strong>unrtf</strong></span>,
+        which, in its older versions, has much trouble with
+        non-western character sets. Many Linux distributions carry
+        outdated <span class="command"><strong>unrtf</strong></span> versions. Check
+        <a class="ulink" href="http://www.recoll.org/features.html" target="_top">http://www.recoll.org/features.html</a> for details.</p></li><li class="listitem"><p>TeX files need <span class="command"><strong>untex</strong></span> or
+        <span class="command"><strong>detex</strong></span>. Check <a class="ulink" href="http://www.recoll.org/features.html" target="_top">http://www.recoll.org/features.html</a> for sources if it's not
+        packaged for your distribution.</p></li><li class="listitem"><p>dvi files need <span class="command"><strong>dvips</strong></span>.</p></li><li class="listitem"><p>djvu files need <span class="command"><strong>djvutxt</strong></span> and
+        <span class="command"><strong>djvused</strong></span> from the
+        <span class="application">DjVuLibre</span> package.</p></li><li class="listitem"><p>Audio files: <span class="application">Recoll</span> releases 1.14 and later use
+        a single <span class="application">Python</span> handler based 
+        on <span class="application">mutagen</span> for all audio file
+        types.</p></li><li class="listitem"><p>Pictures: <span class="application">Recoll</span> uses the 
+         <span class="application">Exiftool</span>
+         <span class="application">Perl</span> package to extract tag
+         information. Most image file formats are supported. Note that
+         there may not be much interest in indexing the technical tags
+         (image size, aperture, etc.). This is only of interest if you
+         store personal tags or textual descriptions inside the image
+         files.</p></li><li class="listitem"><p>chm: files in Microsoft help format need Python and
+          the <span class="application">pychm</span> module (which needs 
+          <span class="application">chmlib</span>).</p></li><li class="listitem"><p>ICS: up to <span class="application">Recoll</span> 1.13, iCalendar files need 
+        <span class="application">Python</span>
+	and the <span class="application">icalendar</span>
+	module. <span class="application">icalendar</span> is not needed for newer
+	versions,  which use internal code.</p></li><li class="listitem"><p>Zip archives need <span class="application">Python</span>
+	(and the standard zipfile module). </p></li><li class="listitem"><p>Rar archives need
+	<span class="application">Python</span>, the
+	<span class="application">rarfile</span> Python module and the
+	<span class="command"><strong>unrar</strong></span> utility.</p></li><li class="listitem"><p>Midi karaoke files need
+	<span class="application">Python</span> and the 
+        <a class="ulink" href="http://pypi.python.org/pypi/midi/0.2.1" target="_top">
+         <span class="application">Midi module</span></a></p></li><li class="listitem"><p>Konqueror webarchive format with Python (uses the
+        Tarfile module).</p></li><li class="listitem"><p>Mimehtml web archive format (support based on
+        the email handler, which introduces some mild weirdness, but
+        still usable).</p></li></ul></div><p>Text, HTML, email folders, and Scribus files are
+        processed internally. <span class="application">Lyx</span> is used to
+        index Lyx files. Many handlers need <span class="command"><strong>iconv</strong></span> and the
+        standard <span class="command"><strong>sed</strong></span> and <span class="command"><strong>awk</strong></span>.
+        </p></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="RCL.INSTALL.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="RCL.INSTALL.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="RCL.INSTALL.BUILDING.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter 5. Installation and configuration </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 5.3. Building from source</td></tr></table></div></body></html>

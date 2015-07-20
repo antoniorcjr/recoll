@@ -1,0 +1,38 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>3.2. Searching with the KDE KIO slave</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="Recoll user manual"><link rel="up" href="RCL.SEARCH.html" title="Chapter 3. Searching"><link rel="prev" href="RCL.SEARCH.html" title="Chapter 3. Searching"><link rel="next" href="RCL.SEARCH.COMMANDLINE.html" title="3.3. Searching on the command line"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">3.2. Searching with the KDE KIO slave</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="RCL.SEARCH.html">Prev</a> </td><th width="60%" align="center">Chapter 3. Searching</th><td width="20%" align="right"> <a accesskey="n" href="RCL.SEARCH.COMMANDLINE.html">Next</a></td></tr></table><hr></div><div class="sect1" title="3.2. Searching with the KDE KIO slave"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="RCL.SEARCH.KIO"></a>3.2. Searching with the KDE KIO slave</h2></div></div></div><div class="sect2" title="3.2.1. What's this"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.SEARCH.KIO.INTRO"></a>3.2.1. What's this</h3></div></div></div><p>The <span class="application">Recoll</span> KIO slave allows performing a <span class="application">Recoll</span> search
+      by entering an appropriate URL in a KDE open dialog, or with an
+      HTML-based interface displayed in
+      <span class="command"><strong>Konqueror</strong></span>.</p><p>The HTML-based interface is similar to the Qt-based
+      interface, but slightly less powerful for now. Its advantage is
+      that you can perform your search while staying fully within the
+      KDE framework: drag and drop from the result list works normally
+      and you have your normal choice of applications for opening
+      files.</p><p>The alternative interface uses a directory view of search
+      results. Due to limitations in the current KIO slave interface,
+      it is currently not obviously useful (to me).</p><p>The interface is described in more detail inside a help
+      file which you can access by entering
+      <code class="filename">recoll:/</code> inside the
+      <span class="command"><strong>konqueror</strong></span> URL line (this works only if the
+      recoll KIO slave has been previously installed).</p><p>The instructions for building this module are located in the
+      source tree. See:
+      <code class="filename">kde/kio/recoll/00README.txt</code>. Some Linux
+      distributions do package the kio-recoll module, so check before
+      diving into the build process, maybe it's already out there ready for
+      one-click installation.</p></div><div class="sect2" title="3.2.2. Searchable documents"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.SEARCH.KIO.SEARCHABLEDOCS"></a>3.2.2. Searchable documents</h3></div></div></div><p>As a sample application, the <span class="application">Recoll</span> KIO slave could allow
+      preparing a set of HTML documents (for example a manual) so that
+      they become their own search interface inside
+      <span class="command"><strong>konqueror</strong></span>.</p><p>This can be done by either explicitly inserting
+      <code class="literal">&lt;a href="recoll://..."&gt;</code> links 
+      around some document areas, or automatically by adding a
+      very small <span class="application">javascript</span> program to the
+      documents, like the following example, which would initiate a search by
+      double-clicking any term:</p><pre class="programlisting">&lt;script language="JavaScript"&gt;
+    function recollsearch() {
+        var t = document.getSelection();
+        window.location.href = 'recoll://search/query?qtp=a&amp;p=0&amp;q=' +
+            encodeURIComponent(t);
+    }
+&lt;/script&gt;
+ ....
+&lt;body ondblclick="recollsearch()"&gt;
+
+</pre></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="RCL.SEARCH.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="RCL.SEARCH.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="RCL.SEARCH.COMMANDLINE.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter 3. Searching </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 3.3. Searching on the command line</td></tr></table></div></body></html>

@@ -1,0 +1,370 @@
+# (C) 2004 J.F.Dockes. License: GPL
+#
+# Recoll default configuration file. This typically lives in
+# @prefix@/share/recoll/examples and provides default values. You can
+# override selected parameters by adding assigments to
+# ~/.recoll/recoll.conf (or $RECOLL_CONFDIR/recoll.conf)
+#
+# Almost all values in this file can be set from the GUI configuration
+# menus, which may be an easier approach than direct editing.
+#
+
+# Space-separated list of directories to index. Next line indexes $HOME
+topdirs = ~
+
+# Wildcard expressions for names of files and directories that we should
+# ignore. If you need index mozilla/thunderbird mail folders, don't put
+# ".*" in there (as was the case with an older sample config)
+# These are simple names, not paths (must contain no / )
+skippedNames = #* bin CVS  Cache cache* .cache caughtspam tmp \
+     .thumbnails .svn \
+     *~ .beagle .git .hg .bzr loop.ps .xsession-errors \
+     .recoll* xapiandb recollrc recoll.conf
+
+# Wildcard expressions for paths we shouldn't go into. The database and
+# configuration directories will automatically be added in there.  
+# We add the usual mount point for removable media by default to remind
+# people that it is a bad idea to naively have recoll work on these
+# (esp. with the monitor: media gets indexed on mount, all data gets erased
+# on unmount...). Typically the presence of /media is mostly a reminder, it
+# would only have effect for someone who's indexing / ...
+# Explicitely adding /media/xxx to the topdirs will override this.
+skippedPaths = /media
+
+# Same for real time indexing. The idea here is that there is stuff that
+# you might want to initially index but not monitor. If daemSkippedPaths is
+# not set, the daemon uses skippedPaths.
+#daemSkippedPaths = 
+
+# Recoll uses FNM_PATHNAME by default when matching skipped paths, which
+# means that /dir1/dir2/dir3 is not matched by */dir3. Can't change the
+# default now, but you can set the following variable to 0 to disable the
+# use of FNM_PATHNAME (see fnmatch(3) man page)
+#skippedPathsFnmPathname = 1
+
+# Option to follow symbolic links. We normally don't, to avoid duplicated
+# indexing (in any case, no effort is made to identify or avoid multiple
+# indexing of linked files)
+#followLinks = 0
+
+# Debug messages. 2 is errors/warnings only. 3 information like doc
+# updates, 4 is quite verbose and 6 very verbose
+loglevel = 3
+logfilename = stderr
+
+# Specific versions of log file name and level for the indexing daemon. The 
+# default is to use the above values.
+# daemloglevel = 3
+# daemlogfilename = /dev/null
+
+# Run directory for the indexing process. The filters sometimes leave
+# garbage in the current directory, so it makes sense to have recollindex
+# chdir to some garbage bin. 3 possible values:
+#  - (literal) tmp : go to temp dir as set by env (RECOLL_TMPDIR else
+#    TMPDIR else /tmp)
+#  - Empty: stay where started
+#  - Absolute path value: go there.
+idxrundir = tmp
+
+# Decide if we store character case and diacritics in the index. If we do, 
+# searches sensitive to case and diacritics can be performed, but the index
+# will be bigger, and some marginal weirdness may sometimes occur. We
+# default to a stripped index for now.
+indexStripChars = 1
+
+# IF the index is not stripped. Decide if we automatically trigger
+# diacritics sensitivity if the search term has accented characters (not in
+# unac_except_trans). Else you need to use the query language and the "D"
+# modifier to specify diacritics sensitivity. Default is no.
+autodiacsens = 0
+
+# IF the index is not stripped. Decide if we automatically trigger
+# character case sensitivity if the search term has upper-case characters
+# in any but the first position. Else you need to use the query language
+# and the "C" modifier to specify character-case sensitivity. Default is
+# yes.
+autocasesens = 1
+
+# Languages for which to build stemming databases at the end of
+# indexing. Stemmer names can be found on http://www.xapian.org 
+# The flag to perform stem expansion at query time is now set from the GUI
+indexstemminglanguages = english 
+
+# Default character set. Values found inside files, ie content tag in html
+# documents, will override this. It can be specified per directory (see
+# below). Used when converting to utf-8 (internal storage format), so it
+# may be quite important for pure text files.
+# The default used to be set to iso8859-1, but we now take it from the nls 
+# environment (LC_ALL/LC_CTYPE/LANG). The ultimate hardwired default is
+# still 8859-1. If for some reason you want a general default which doesnt
+# match your LANG and is not 8859-1, set it here.
+# defaultcharset = iso-8859-1
+
+# A list of characters, encoded in UTF-8, which should be handled specially
+# when converting text to unaccented lowercase. For example, in Swedish,
+# the letter a with diaeresis has full alphabet citizenship and should not
+# be turned into an a. 
+# Each element in the space-separated list has the special character as
+# first element and the translation following. The handling of both the
+# lowercase and upper-case versions of a character should be specified, as
+# appartenance to the list will turn-off both standard accent and case
+# processing. Examples: 
+# Swedish:
+# unac_except_trans = ää Ää öö Öö üü Üü ßss œoe Œoe æae Æae ﬀff ﬁfi ﬂfl åå Åå
+# German:
+# unac_except_trans = ää Ää öö Öö üü Üü ßss œoe Œoe æae Æae ﬀff ﬁfi ﬂfl
+# In French, you probably want to decompose oe and ae and nobody would type
+# a German ß
+# unac_except_trans = ßss œoe Œoe æae Æae ﬀff ﬁfi ﬂfl
+# Reasonable default for all until someone protests. These decompositions
+# are not performed by unac, but I cant imagine someone typing the composed
+# forms in a search.
+unac_except_trans = ßss œoe Œoe æae Æae ﬀff ﬁfi ﬂfl
+
+# Maximum expansion count for a single term (ie: when using wildcards).
+# We used to not limit this at all (except for filenames where the limit
+# was too low at 1000), but it is unreasonable with a big index. 
+# Default 10 000
+maxTermExpand = 10000
+
+# Maximum number of clauses we add to a single Xapian query. In some cases,
+# the result of term expansion can be multiplicative, and we want to avoid
+# eating all the memory. Default 50000
+maxXapianClauses = 50000
+
+# Where to store the database (directory). This may be an absolute path,
+# else it is taken as relative to the configuration directory (-c argument
+# or $RECOLL_CONFDIR). 
+# If nothing is specified, the default is then ~/.recoll/xapiandb/
+dbdir = xapiandb
+
+# Indexing process threads configuration. If Recoll is configured for 
+# multithreading, this defines what queues are active and how many threads
+# to start for any of them. The default values were found good on a
+# quad-core processor. The three steps are file conversion, term extraction
+# and conversion and Xapian index update. The three queue values define the
+# max number of jobs waiting on one of the corresponding queues. Setting a
+# value to -1 disables a queue (replaced by a direct call). The thrTcounts
+# values define the number of threads to start for each queue. The last
+# value can only be one (as Xapian is single-threaded).
+# If the first element in thrQSizes is 0, recollindex will attempt to set
+# roughly guestimated values based on the number of CPUs. 
+#
+# The following are the best setup on my core i5 system (4 cores, no
+# hyperthreading, multiple disks).
+#thrQSizes = 2 2 2
+#thrTCounts =  4 2 1
+# The default is to let recoll guess.
+thrQSizes = 0
+
+# Maximum file system occupation before we stop indexing. The default value
+# is 0, meaning no checking. The value is a percentage, corresponding to
+# what the "Capacity" df output column shows.
+maxfsoccuppc = 0
+
+# Threshold (megabytes of new data) where we flush from memory to disk
+# index. Setting this (ie to 10) can help control memory usage. 
+#
+# A value of 0 means no explicit flushing, which lets Xapian perform its
+# own thing, meaning flushing every XAPIAN_FLUSH_THRESHOLD documents
+# created, modified or deleted. XAPIAN_FLUSH_THRESHOLD is an environment
+# variable. As memory usage depends on average document size, not only
+# document count, this is not very useful. 
+#
+# The default value of 10 MB may be a bit low. If you are looking for
+# maximum speed, you may want to experiment with values between 20 and
+# 80. In my experience, values beyond 100 are always counterproductive. If
+# you find otherwise, please drop me a note.
+idxflushmb = 10
+
+# Place to search for executable filters. If RECOLL_FILTERSDIR is set in
+# the environment, we use it instead
+filtersdir = @prefix@/share/recoll/filters
+
+# Place to search for icons. The only reason to change this would be if you
+# want to change the icons displayed in the result list
+iconsdir = @prefix@/share/recoll/images
+
+# Should we use the system's 'file -i' command as a final step in file type
+# identification ? This may be useful, but will usually cause the
+# indexation of many bogus 'text' files
+usesystemfilecommand = 1
+# Actual command to use as "file -i" workalike. xdg-mime works fine here.
+# The file path will be added as a last parameter to the command line. If
+# that's not what your preferred command would like, use an intermediary
+# script.
+# systemfilecommand = xdg-mime query filetype
+# systemfilecommand = file -i filetype
+
+# Should we index the file names of files with mime types we don't
+# know? (we can otherwise just ignore them)
+indexallfilenames = 1
+
+# A restrictive list of indexed mime types. Normally not set. If it is set,
+# only the types from the list will have their contents indexed (the names
+# will be indexed anyway if indexallfilenames is set as by default). Mime
+# type names should be taken from the mimemap file.
+#
+# indexedmimetypes = 
+
+# An excluded list of mime types. It can be redefined in subdirectories, 
+# so can be used to locally exclude some types.
+#
+# excludededmimetypes = 
+
+#
+# Size limit for archive members. This is passed to the filters in the
+# environment as RECOLL_FILTER_MAXMEMBERKB
+# 
+membermaxkbs = 50000
+
+# Size limit for compressed files. We need to decompress these in a
+# temporary directory for identification, which can be wasteful in some
+# cases. Limit the waste. Negative means no limit. 0 results in no
+# processing of any compressed file. Used to be -1 by default.
+compressedfilemaxkbs = 20000
+
+# Size limit for text files. This is for skipping monster logs
+textfilemaxmbs = 20
+
+# Page size for text files. If this is set, text/plain files will be
+# divided into documents of approximately this size. May be useful to
+# access pieces of big text files which would be problematic to load as one
+# piece into the preview window. Might be useful for big logs
+textfilepagekbs = 1000
+
+# Maximum external filter execution time. Default 20mn. This is mainly
+# to avoid infinite loops in postscript files (loop.ps)
+filtermaxseconds = 1200
+
+# Length of abstracts we store while indexing. Longer will make for a
+# bigger db
+# idxabsmlen = 250
+
+# Truncation length of stored metadata fields. This does not affect
+# indexing, just what can be displayed inside results.
+# idxmetastoredlen = 150
+
+# Language definitions to use when creating the aspell dictionary. 
+# The value must match a set of aspell language definition files. 
+# You can type "aspell config"  to see where these are installed.
+# The default if this is not set is to use the NLS environment to guess the
+# value
+# aspellLanguage = en
+
+# Disabling aspell use. The aspell dictionary generation takes some time,
+# and some combinations of aspell version, language, and local terms,
+# result in aspell dumping core each time. You can disable the aspell
+# dictionary generation by setting the following variable:
+# noaspell = 1
+
+# Timing parameters for the real time mode:
+#
+# Seconds between auxiliary databases updates (stemdb, aspell):
+# monauxinterval = 3600
+#
+# Resting time (seconds) during which we let the queue accumulate, in hope
+# that events to the same file will merge, before we start indexing:
+# monixinterval = 30
+#
+# Definitions for files which get a longer delay before reindexing is
+# allowed. This is for fast-changing files, that should only be reindexed
+# once in a while. A list of wildcardPattern:seconds pairs. The patterns
+# are matched with fnmatch(pattern, path, 0) You can quote entries containing
+# white space with double quotes. The default is empty, here follows an
+# example:
+# mondelaypatterns = *.log:20  "*with spaces.*:30"
+
+# ionice class for monitor (on platforms where this is supported)
+# monioniceclass = 3
+# ionice class param for monitor (on platforms where this is supported)
+# monioniceclassdata = 
+
+# If this is set, process the directory where the Recoll Web browser plugins
+# copy visited pages for indexing.
+processwebqueue = 0
+# The path to the Web indexing queue. This is hard-coded in the
+# plugin as ~/.recollweb/ToIndex so there should be no need to change it. 
+#webqueuedir = ~/.recollweb/ToIndex
+# This is only used by the web history indexing code, and
+# defines where the cache for visited pages will live. Default:
+# $RECOLL_CONFDIR/webcache 
+webcachedir = webcache
+# This is only used by the web history indexing code, and
+# defines the maximum size for the web page cache. Default: 40 MB. 
+# ** Quite unfortunately, this is only used when creating the file, you
+#   need to delete the cache for a change to be taken into account **
+webcachemaxmbs = 40
+
+# The directory where mbox message offsets cache files are held. This is
+# normally $RECOLL_CONFDIR/mboxcache, but it may be useful to share a
+# directory between different configurations. 
+#mboxcachedir = mboxcache
+
+# The minimum mbox file size over which we cache the offsets. There is
+# really no sense in caching offsets for small files. The default is 5 MB.
+#mboxcacheminmbs = 5
+
+# Maximum number of positions we walk while populating a snippet for the
+# result list. The default of 1 000 000 may be insufficient for big
+# documents, the consequence would be snippets with possibly
+# meaning-altering missing words. 
+snippetMaxPosWalk = 1000000
+
+# Use mtime instead of default ctime to determine if a file has been
+# modified (in addition to size, which is always used).
+# Setting this can reduce re-indexing on systems where extended attributes
+# are used (by some other applications), but not indexed (changing
+# ext. attrs. only affects ctime). 
+# Notes:
+# - this may prevent detection of change in some marginal file rename cases
+#   (the target would need to have the same size and mtime).
+# - You should probably also set noxattrfields to 1 in this case, except if
+#   you still prefer to perform xattr indexing, for example if the local
+#   file update pattern makes it of value (as in general, there is a risk
+#   for pure extended attributes updates without file modification to go
+#   undetected). Perform a full index reset after changing this.
+testmodifusemtime = 0
+
+# Disable extended attributes conversion to metadata fields. This probably
+# needs to be set if testmodifusemtime is set.
+noxattrfields = 0
+
+# You could specify different parameters for a subdirectory like this:
+#[~/hungariandocs/plain]
+#defaultcharset = iso-8859-2
+
+# You can set fields on all files of a specific fs area. (rclaptg can be
+# used for application selection inside mimeview). 
+# Syntax is the usual name = value ; attr1 = val1 ; ... with an empty value
+# so needs initial semi-colon
+#[/some/app/directory]
+#localfields = ; rclaptg = someapp; otherfield = somevalue
+
+# It's also possible to execute external commands to gather external
+# metadata, for example tmsu tags.
+# There can be several entries, separated by semi-colons, each defining
+# which field name the data goes into and the command to use. Don't forget the
+# initial semi-colon. All the field names must be different. You can use
+# aliases in the "field" file if necessary. 
+# As a not too pretty hack conceded to convenience, any field name
+# beginning with "rclmulti" will be taken as an indication that the command
+# returns multiple field values inside a text blob formatted as a recoll
+# configuration file ("fieldname = fieldvalue" lines). The rclmultixx name
+# will be ignored, and field names and values will be parsed from the data.
+#[/some/area/of/the/fs]
+#metadatacmds = ; tags = tmsu tags %f; rclmulti1 = cmdOutputsConf %f
+
+[/usr/share/man]
+followLinks = 1
+
+# Enable thunderbird mbox format quirks where appropriate, and same for
+# mozilla/seamonkey
+[~/.thunderbird]
+mhmboxquirks = tbird
+[~/.mozilla]
+mhmboxquirks = tbird
+
+# pidgin / purple directories for irc chats have names beginning with #
+[~/.purple]
+skippedNames = 

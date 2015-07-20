@@ -1,0 +1,68 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>2.2. Index storage</title><link rel="stylesheet" type="text/css" href="docbook-xsl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="Recoll user manual"><link rel="up" href="RCL.INDEXING.html" title="Chapter 2. Indexing"><link rel="prev" href="RCL.INDEXING.html" title="Chapter 2. Indexing"><link rel="next" href="RCL.INDEXING.CONFIG.html" title="2.3. Index configuration"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">2.2. Index storage</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="RCL.INDEXING.html">Prev</a> </td><th width="60%" align="center">Chapter 2. Indexing</th><td width="20%" align="right"> <a accesskey="n" href="RCL.INDEXING.CONFIG.html">Next</a></td></tr></table><hr></div><div class="sect1" title="2.2. Index storage"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="RCL.INDEXING.STORAGE"></a>2.2. Index storage</h2></div></div></div><p>The default location for the index data is the
+      <code class="filename">xapiandb</code> subdirectory of the <span class="application">Recoll</span>
+      configuration directory, typically
+      <code class="filename">$HOME/.recoll/xapiandb/</code>. This can be
+      changed via two different methods (with different purposes):
+      </p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>You can specify a different configuration
+          directory by setting the <code class="envar">RECOLL_CONFDIR</code>
+          environment variable, or using the <code class="option">-c</code>
+          option to the <span class="application">Recoll</span> commands. This method would typically be
+          used to index different areas of the file system to
+          different indexes. For example, if you were to issue the
+          following commands: 
+          </p><pre class="programlisting">
+export RECOLL_CONFDIR=~/.indexes-email
+recoll
+          </pre><p> Then <span class="application">Recoll</span> would use configuration files
+          stored in <code class="filename">~/.indexes-email/</code> and,
+          (unless specified otherwise in
+          <code class="filename">recoll.conf</code>) would look for 
+          the index in
+          <code class="filename">~/.indexes-email/xapiandb/</code>.</p><p>Using multiple configuration directories and <a class="link" href="RCL.INSTALL.CONFIG.html#RCL.INSTALL.CONFIG.RECOLLCONF" title="5.4.1. The main configuration file, recoll.conf">configuration
+          options</a> allows you to tailor multiple configurations and
+          indexes to handle whatever subset of the available data you wish
+          to make searchable.</p></li><li class="listitem"><p>For a given configuration directory, you can
+          specify a non-default storage location for the index by setting
+          the <code class="varname">dbdir</code> parameter in the configuration file
+          (see the <a class="link" href="RCL.INSTALL.CONFIG.html#RCL.INSTALL.CONFIG.RECOLLCONF" title="5.4.1. The main configuration file, recoll.conf">configuration
+          section</a>). This method would mainly be of use if you wanted
+          to keep the configuration directory in its default location, but
+          desired another location for the index, typically out of disk
+          occupation concerns.</p></li></ul></div><p>
+      </p><p>The size of the index is determined by the size of the set
+        of documents, but the ratio can vary a lot. For a typical
+        mixed set of documents, the index size will often be close to
+        the data set size. In specific cases (a set of compressed mbox
+        files for example), the index can become much bigger than the
+        documents. It may also be much smaller if the documents
+        contain a lot of images or other non-indexed data (an extreme
+        example being a set of mp3 files where only the tags would be
+        indexed).</p><p>Of course, images, sound and video do not increase the
+        index size, which means that nowadays (2012), typically, even a big
+        index will be negligible against the total amount of data on the
+        computer.</p><p>The index data directory (<code class="filename">xapiandb</code>)
+	only contains data that can be completely rebuilt by an index run
+	(as long as the original documents exist), and it can always be
+	destroyed safely.</p><div class="sect2" title="2.2.1. Xapian index formats"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.INDEXING.STORAGE.FORMAT"></a>2.2.1. <span class="application">Xapian</span> index formats</h3></div></div></div><p><span class="application">Xapian</span> versions usually support several formats for index
+          storage. A given major <span class="application">Xapian</span> version will have a current format,
+          used to create new indexes, and will also support the format from
+          the previous major version.</p><p><span class="application">Xapian</span> will not convert automatically an existing index
+          from the older format to the newer one. If you want to upgrade to
+          the new format, or if a very old index needs to be converted
+          because its format is not supported any more, you will have to
+          explicitly delete the old index, then run a normal indexing
+          process.</p><p>Using the <code class="option">-z</code> option to
+          <span class="command"><strong>recollindex</strong></span> is not sufficient to change the
+          format, you will have to delete all files inside the index
+          directory (typically <code class="filename">~/.recoll/xapiandb</code>)
+          before starting the indexing.</p></div><div class="sect2" title="2.2.2. Security aspects"><div class="titlepage"><div><div><h3 class="title"><a name="RCL.INDEXING.STORAGE.SECURITY"></a>2.2.2. Security aspects</h3></div></div></div><p>The <span class="application">Recoll</span> index does not hold copies of the indexed
+          documents. But it does hold enough data to allow for an almost
+          complete reconstruction. If confidential data is indexed,
+          access to the database directory should be restricted. </p><p><span class="application">Recoll</span> (since version 1.4) will create the configuration
+          directory with a mode of 0700 (access by owner only). As the
+          index data directory is by default a sub-directory of the
+          configuration directory, this should result in appropriate
+          protection.</p><p>If you use another setup, you should think of the kind
+          of protection you need for your index, set the directory
+          and files access modes appropriately, and also maybe adjust
+          the <code class="literal">umask</code> used during index updates.</p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="RCL.INDEXING.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="RCL.INDEXING.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="RCL.INDEXING.CONFIG.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter 2. Indexing </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 2.3. Index configuration</td></tr></table></div></body></html>

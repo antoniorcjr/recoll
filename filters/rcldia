@@ -1,0 +1,110 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# dia (http://live.gnome.org/Dia) file filter for recoll
+# stefan.friedel@iwr.uni-heidelberg.de 2012
+#
+# add the following to ~/.recoll/mimeconf into the [index] section:
+# application/x-dia-diagram = execm rcldia;mimetype=text/plain;charset=utf-8
+# and into the [icons] section:
+# application/x-dia-diagram = drawing
+# and finally under [categories]:
+# other = ...\
+#       application/x-dia-diagram
+#
+# in ~/.recoll/mimemap:
+# .dia = application/x-dia-diagram
+
+# Small fixes from jfd: dia files are sometimes not compressed.  
+import rclexecm
+import re
+from gzip import GzipFile
+import xml.parsers.expat
+
+# some regexps to parse/format the xml data: delete #/spaces at the b/eol and
+# ignore empty lines
+rhs = re.compile(r'^#\s*(.*)')
+rhe = re.compile(r'(.*)\s*#$')
+rempty = re.compile(r'^#?\s*#?$')
+
+# xml parser for dia xml file
+class Parser:
+    def __init__(self,rclem):
+        self._parser = xml.parsers.expat.ParserCreate(encoding='UTF-8')
+        self._parser.StartElementHandler = self.startelement 
+        self._parser.EndElementHandler = self.endelement
+        self._parser.CharacterDataHandler = self.chardata
+        self.string = []
+        self.handlethis = False
+        self.rclem = rclem
+
+    def startelement(self, name, attrs):
+        if name == 'dia:string':
+            self.handlethis = True
+        else:
+            self.handlethis = False
+    
+    def chardata(self,data):
+        if self.handlethis:
+            # check if line is not empty and replace hashes/spaces
+            if not rempty.search(data):
+                self.string.append(rhe.sub(r'\1',rhs.sub(r'\1',data)))
+    
+    def endelement(self,name):
+        self.handlethis = False
+
+    def feed(self, fh):
+        self._parser.ParseFile(fh)
+        del self._parser
+
+class DiaExtractor:
+    def __init__(self, em):
+        self.em = em
+
+    def extractdia(self):
+        docdata = ""
+        ipath = ""
+        try:
+            docdata = self.ExtractDiaText()
+            ok = True
+        except Exception, err:
+            ok = False
+        iseof = rclexecm.RclExecM.eofnext
+        self.em.setmimetype("text/plain")
+        return (ok, docdata, ipath, iseof)
+
+    ###### File type handler api, used by rclexecm ---------->
+    def openfile(self, params):
+        try:
+            self.dia = GzipFile(params["filename:"], 'r')
+            # Dial files are sometimes not compressed. Quite weirdly,
+            # GzipFile does not complain until we try to read. Have to do it
+            # here to be able to retry an uncompressed open.
+            data = self.dia.readline()
+            self.dia.seek(0)
+            return True
+        except:
+            # File not compressed ?
+            try:
+                self.dia = open(params["filename:"], 'r')
+            except:
+                return False
+            return True
+
+    def getipath(self, params):
+        ok, data, ipath, eof = self.extractdia()
+        return (ok, data, ipath, eof)
+        
+    def getnext(self, params):
+        ok, data, ipath, eof = self.extractdia()
+        return (ok, data, ipath, eof)
+
+    ###### read data
+    def ExtractDiaText(self):
+        diap = Parser(self.em)
+        diap.feed(self.dia)
+        return '\n'.join(diap.string)
+
+# Main program: create protocol handler and extractor and run them
+proto = rclexecm.RclExecM()
+extract = DiaExtractor(proto)
+rclexecm.main(proto, extract)

@@ -1,0 +1,21 @@
+
+# Common/default for all systems, can be overridden by sys-specific include
+
+COMMONCXXFLAGS = -I. \
+	       -I$(depth)/aspell \
+	       -I$(depth)/bincimapmime \
+	       -I$(depth)/common \
+	       -I$(depth)/index \
+	       -I$(depth)/internfile \
+	       -I$(depth)/rcldb \
+	       -I$(depth)/unac \
+	       -I$(depth)/utils 
+
+# We happen to be using gcc on all platforms for now. Can be overridden in
+# the sys file or localdefs
+SYSPICFLAGS = -fPIC -DPIC
+
+LIBRECOLL = -L$(depth)/lib -lrecoll -Wl,-rpath=$(libdir)/recoll
+
+RANLIB = test -f
+AR=ar
